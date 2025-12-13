@@ -14,7 +14,145 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chapter_cards: {
+        Row: {
+          card_description: string
+          chapter_id: string
+          created_at: string
+          figure_number: string
+          id: string
+          illustration_key: string
+          is_reversed: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          card_description: string
+          chapter_id: string
+          created_at?: string
+          figure_number: string
+          id?: string
+          illustration_key: string
+          is_reversed?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          card_description?: string
+          chapter_id?: string
+          created_at?: string
+          figure_number?: string
+          id?: string
+          illustration_key?: string
+          is_reversed?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chapter_cards_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: true
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chapters: {
+        Row: {
+          chapter_number: number
+          created_at: string
+          description: string
+          icon_name: string | null
+          id: string
+          introduction: string | null
+          is_published: boolean
+          slug: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chapter_number: number
+          created_at?: string
+          description: string
+          icon_name?: string | null
+          id?: string
+          introduction?: string | null
+          is_published?: boolean
+          slug: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          chapter_number?: number
+          created_at?: string
+          description?: string
+          icon_name?: string | null
+          id?: string
+          introduction?: string | null
+          is_published?: boolean
+          slug?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      topics: {
+        Row: {
+          chapter_id: string
+          code_example: string | null
+          content: string
+          created_at: string
+          id: string
+          illustration_key: string | null
+          section_number: string
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chapter_id: string
+          code_example?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          illustration_key?: string | null
+          section_number: string
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          chapter_id?: string
+          code_example?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          illustration_key?: string | null
+          section_number?: string
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
