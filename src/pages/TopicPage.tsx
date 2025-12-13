@@ -71,11 +71,16 @@ const TopicPage = () => {
 
   const isLoading = chapterLoading || topicsLoading;
 
-  // Strip code blocks from content for cleaner reading
+  // Clean content for reading - remove code blocks and tables
   const cleanContent = (content: string) => {
-    // Remove code blocks but keep the explanatory text
     return content
+      // Remove code blocks
       .replace(/```[\s\S]*?```/g, '')
+      // Remove markdown tables (lines starting with |)
+      .replace(/^\|.*\|$/gm, '')
+      // Remove table separator lines
+      .replace(/^\s*[-:|\s]+$/gm, '')
+      // Clean up excessive newlines
       .replace(/\n{3,}/g, '\n\n')
       .trim();
   };
@@ -162,22 +167,62 @@ const TopicPage = () => {
 
       {/* Content */}
       <ContentSection className="container mx-auto px-8 md:px-16">
-        <div className="max-w-3xl mx-auto">
-          <div className="prose prose-invert prose-lg max-w-none
-            prose-headings:font-display prose-headings:text-primary
-            prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6
-            prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
-            prose-h4:text-lg prose-h4:mt-6 prose-h4:mb-3
-            prose-p:font-body prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:text-lg
-            prose-strong:text-primary prose-strong:font-semibold
-            prose-ul:text-foreground/80 prose-ol:text-foreground/80
-            prose-li:marker:text-primary prose-li:text-lg prose-li:leading-relaxed
-            prose-a:text-primary prose-a:underline-offset-4 hover:prose-a:text-primary/80
-          ">
-            <ReactMarkdown>
-              {cleanContent(currentTopic.content)}
-            </ReactMarkdown>
-          </div>
+        <div className="max-w-3xl mx-auto topic-content">
+          <ReactMarkdown
+            components={{
+              h2: ({ children }) => (
+                <h2 className="font-display text-2xl text-primary mt-12 mb-6 uppercase tracking-wide">
+                  {children}
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3 className="font-display text-xl text-primary mt-8 mb-4 uppercase tracking-wide">
+                  {children}
+                </h3>
+              ),
+              h4: ({ children }) => (
+                <h4 className="font-display text-lg text-primary mt-6 mb-3 uppercase tracking-wide">
+                  {children}
+                </h4>
+              ),
+              p: ({ children }) => (
+                <p className="font-body text-lg text-foreground leading-relaxed mb-6">
+                  {children}
+                </p>
+              ),
+              strong: ({ children }) => (
+                <strong className="text-primary font-semibold">{children}</strong>
+              ),
+              em: ({ children }) => (
+                <em className="text-foreground/80 italic">{children}</em>
+              ),
+              ul: ({ children }) => (
+                <ul className="font-body text-lg text-foreground/90 leading-relaxed mb-6 ml-6 list-disc marker:text-primary">
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="font-body text-lg text-foreground/90 leading-relaxed mb-6 ml-6 list-decimal marker:text-primary">
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li className="mb-2">{children}</li>
+              ),
+              a: ({ href, children }) => (
+                <a href={href} className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
+                  {children}
+                </a>
+              ),
+              code: ({ children }) => (
+                <code className="font-mono text-sm bg-card/50 text-primary px-1.5 py-0.5 rounded border border-border/50">
+                  {children}
+                </code>
+              ),
+            }}
+          >
+            {cleanContent(currentTopic.content)}
+          </ReactMarkdown>
         </div>
       </ContentSection>
 
