@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react';
 
-const EncryptionSVG = () => {
+interface EncryptionSVGProps {
+  isPaused?: boolean;
+}
+
+const EncryptionSVG = ({ isPaused = false }: EncryptionSVGProps) => {
   const [phase, setPhase] = useState<'plain' | 'encrypting' | 'encrypted' | 'decrypting'>('plain');
 
   useEffect(() => {
+    if (isPaused) return;
+    
     const phases: ('plain' | 'encrypting' | 'encrypted' | 'decrypting')[] = ['plain', 'encrypting', 'encrypted', 'decrypting'];
     let currentIndex = 0;
 
@@ -13,7 +19,7 @@ const EncryptionSVG = () => {
     }, 1500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isPaused]);
 
   const isEncrypting = phase === 'encrypting';
   const isEncrypted = phase === 'encrypted';

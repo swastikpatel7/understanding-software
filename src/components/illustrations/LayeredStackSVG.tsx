@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
 
-const LayeredStackSVG = () => {
+interface LayeredStackSVGProps {
+  isPaused?: boolean;
+}
+
+const LayeredStackSVG = ({ isPaused = false }: LayeredStackSVGProps) => {
   const [hoveredLayer, setHoveredLayer] = useState<number | null>(null);
   const [floatOffset, setFloatOffset] = useState(0);
 
   useEffect(() => {
+    if (isPaused) return;
+    
     let frame: number;
     let time = 0;
     
@@ -16,7 +22,7 @@ const LayeredStackSVG = () => {
     
     frame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frame);
-  }, []);
+  }, [isPaused]);
 
   const layers = [
     { name: 'UI LAYER', color: 'fill-background', y: 0 },

@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
 
-const HTTPRequestSVG = () => {
+interface HTTPRequestSVGProps {
+  isPaused?: boolean;
+}
+
+const HTTPRequestSVG = ({ isPaused = false }: HTTPRequestSVGProps) => {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
+    if (isPaused) return;
+    
     const interval = setInterval(() => {
       setStep((prev) => (prev + 1) % 4);
     }, 1200);
     return () => clearInterval(interval);
-  }, []);
+  }, [isPaused]);
 
   return (
     <div className="relative">

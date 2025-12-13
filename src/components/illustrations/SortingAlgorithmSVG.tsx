@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 
-const SortingAlgorithmSVG = () => {
+interface SortingAlgorithmSVGProps {
+  isPaused?: boolean;
+}
+
+const SortingAlgorithmSVG = ({ isPaused = false }: SortingAlgorithmSVGProps) => {
   const [step, setStep] = useState(0);
   const [comparing, setComparing] = useState<[number, number] | null>(null);
 
-  const initialBars = [65, 35, 85, 45, 95, 25, 55];
   const sortingSteps = [
     [65, 35, 85, 45, 95, 25, 55],
     [35, 65, 85, 45, 95, 25, 55],
@@ -20,12 +23,14 @@ const SortingAlgorithmSVG = () => {
   ];
 
   useEffect(() => {
+    if (isPaused) return;
+    
     const interval = setInterval(() => {
       setStep(prev => (prev + 1) % sortingSteps.length);
     }, 1500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isPaused]);
 
   useEffect(() => {
     setComparing(comparisons[step]);
