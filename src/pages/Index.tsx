@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import SectionDivider from '@/components/SectionDivider';
 import ContentSection from '@/components/ContentSection';
@@ -194,9 +195,12 @@ From the stack to the heap, from pointers to garbage collection, memory manageme
             Or at the very least, you can pretend to be smart in front of your friends.
           </p>
           
-          <button className="mt-8 px-8 py-3 border-2 border-primary text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+          <Link 
+            to="/chapters/data-structures" 
+            className="mt-8 inline-block px-8 py-3 border-2 border-primary text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+          >
             Begin Reading
-          </button>
+          </Link>
         </div>
       </ContentSection>
 
