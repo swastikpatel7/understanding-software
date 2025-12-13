@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react';
 
-const BinaryTreeSVG = () => {
+interface BinaryTreeSVGProps {
+  isPaused?: boolean;
+}
+
+const BinaryTreeSVG = ({ isPaused = false }: BinaryTreeSVGProps) => {
   const [highlightedPath, setHighlightedPath] = useState<number[]>([0]);
 
   useEffect(() => {
+    if (isPaused) return;
+    
     const paths = [
       [0, 1, 3],
       [0, 1, 4],
@@ -18,7 +24,7 @@ const BinaryTreeSVG = () => {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isPaused]);
 
   const nodes = [
     { id: 0, x: 200, y: 40, value: '50' },

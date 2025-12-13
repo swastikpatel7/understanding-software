@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
 
-const DatabaseSVG = () => {
+interface DatabaseSVGProps {
+  isPaused?: boolean;
+}
+
+const DatabaseSVG = ({ isPaused = false }: DatabaseSVGProps) => {
   const [activeRow, setActiveRow] = useState(0);
   const [queryActive, setQueryActive] = useState(false);
 
   useEffect(() => {
+    if (isPaused) return;
+    
     const rowInterval = setInterval(() => {
       setActiveRow(prev => (prev + 1) % 4);
     }, 1200);
@@ -18,7 +24,7 @@ const DatabaseSVG = () => {
       clearInterval(rowInterval);
       clearInterval(queryInterval);
     };
-  }, []);
+  }, [isPaused]);
 
   return (
     <svg

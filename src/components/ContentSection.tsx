@@ -1,11 +1,12 @@
 interface ContentSectionProps {
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }
 
-const ContentSection = ({ children, className = '' }: ContentSectionProps) => {
+const ContentSection = ({ children, className = '', id }: ContentSectionProps) => {
   return (
-    <section className={`relative z-10 py-12 md:py-20 ${className}`}>
+    <section id={id} className={`relative z-10 py-12 md:py-20 ${className}`}>
       {children}
     </section>
   );

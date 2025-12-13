@@ -97,7 +97,7 @@
     line-height: 1.7;
   }
 
-  /* Dot grid background pattern */
+  /* Dot grid background pattern - finer and denser */
   body::before {
     content: '';
     position: fixed;
@@ -105,11 +105,11 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: radial-gradient(circle, hsl(var(--dot-color)) 1px, transparent 1px);
-    background-size: 24px 24px;
+    background-image: radial-gradient(circle, hsl(var(--dot-color)) 0.5px, transparent 0.5px);
+    background-size: 12px 12px;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.5;
+    opacity: 0.4;
   }
 
   h1, h2, h3, h4, h5, h6 {

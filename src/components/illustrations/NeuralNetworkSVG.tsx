@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
 
-const NeuralNetworkSVG = () => {
+interface NeuralNetworkSVGProps {
+  isPaused?: boolean;
+}
+
+const NeuralNetworkSVG = ({ isPaused = false }: NeuralNetworkSVGProps) => {
   const [activeConnections, setActiveConnections] = useState<number[]>([]);
 
   useEffect(() => {
+    if (isPaused) return;
+    
     const interval = setInterval(() => {
       const newActive = Array.from({ length: 3 }, () => Math.floor(Math.random() * 24));
       setActiveConnections(newActive);
     }, 1500);
     return () => clearInterval(interval);
-  }, []);
+  }, [isPaused]);
 
   const inputNodes = [
     { x: 80, y: 60 },

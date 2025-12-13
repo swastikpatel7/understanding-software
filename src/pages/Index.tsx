@@ -3,6 +3,8 @@ import SectionDivider from '@/components/SectionDivider';
 import ContentSection from '@/components/ContentSection';
 import TopicCard from '@/components/TopicCard';
 import Footer from '@/components/Footer';
+import TableOfContents from '@/components/TableOfContents';
+import InteractiveSVGWrapper from '@/components/illustrations/InteractiveSVGWrapper';
 import NeuralNetworkSVG from '@/components/illustrations/NeuralNetworkSVG';
 import BinaryTreeSVG from '@/components/illustrations/BinaryTreeSVG';
 import HTTPRequestSVG from '@/components/illustrations/HTTPRequestSVG';
@@ -16,11 +18,12 @@ const Index = () => {
   return (
     <div className="min-h-screen relative">
       <Header />
+      <TableOfContents />
       
       <SectionDivider />
 
       {/* Hero Introduction */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
+      <ContentSection id="intro" className="container mx-auto px-8 md:px-16 scroll-mt-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
           {/* Left column - Intro text */}
           <div className="space-y-6">
@@ -33,7 +36,9 @@ const Index = () => {
               The network learns by making predictions, comparing them to the expected output, and then adjusting the weights to reduce the error. This process, called backpropagation, is at the heart of modern AI.
             </p>
 
-            <NeuralNetworkSVG />
+            <InteractiveSVGWrapper>
+              <NeuralNetworkSVG />
+            </InteractiveSVGWrapper>
 
             <p className="font-body leading-relaxed">
               Understanding these fundamentals isn't just academic – it changes how you think about the software you use every day.
@@ -42,7 +47,9 @@ const Index = () => {
 
           {/* Right column - Main illustration */}
           <div className="space-y-8">
-            <LayeredStackSVG />
+            <InteractiveSVGWrapper>
+              <LayeredStackSVG />
+            </InteractiveSVGWrapper>
             
             <div className="space-y-4 mt-8">
               <p className="font-body text-lg font-semibold text-foreground">
@@ -64,28 +71,36 @@ const Index = () => {
       <SectionDivider />
 
       {/* Data Structures Section */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
+      <ContentSection id="data-structures" className="container mx-auto px-8 md:px-16 scroll-mt-8">
         <TopicCard
           title="DATA STRUCTURES"
           figureNumber="CHAPTER 02"
           description={`Maybe you've always wanted to know how data is organized in memory. Binary trees, for instance, are elegant structures that allow for incredibly fast searching.
 
 Each node can have at most two children – a left child with a smaller value and a right child with a larger value. This simple rule creates a powerful searching mechanism.`}
-          illustration={<BinaryTreeSVG />}
+          illustration={
+            <InteractiveSVGWrapper>
+              <BinaryTreeSVG />
+            </InteractiveSVGWrapper>
+          }
         />
       </ContentSection>
 
       <SectionDivider />
 
       {/* Web Development Section */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
+      <ContentSection id="web" className="container mx-auto px-8 md:px-16 scroll-mt-8">
         <TopicCard
           title="HOW THE WEB WORKS"
           figureNumber="CHAPTER 03"
           description={`Or perhaps you've wondered what happens when you type a URL into your browser. The request travels through cables and routers, finds its way to a server, and returns with the data you requested.
 
 Every interaction you have with a website involves this dance of requests and responses – GET, POST, PUT, DELETE – each with its own purpose and protocol.`}
-          illustration={<HTTPRequestSVG />}
+          illustration={
+            <InteractiveSVGWrapper>
+              <HTTPRequestSVG />
+            </InteractiveSVGWrapper>
+          }
           isReversed
         />
       </ContentSection>
@@ -93,28 +108,36 @@ Every interaction you have with a website involves this dance of requests and re
       <SectionDivider />
 
       {/* Databases Section */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
+      <ContentSection id="databases" className="container mx-auto px-8 md:px-16 scroll-mt-8">
         <TopicCard
           title="DATABASES & STORAGE"
           figureNumber="CHAPTER 04"
           description={`Where does your data actually live? Databases are the backbone of every application, storing everything from your profile picture to your banking transactions.
 
 Relational databases organize data into tables with rows and columns, using SQL to query information. Each query is optimized, indexed, and executed in milliseconds.`}
-          illustration={<DatabaseSVG />}
+          illustration={
+            <InteractiveSVGWrapper>
+              <DatabaseSVG />
+            </InteractiveSVGWrapper>
+          }
         />
       </ContentSection>
 
       <SectionDivider />
 
       {/* Algorithms Section */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
+      <ContentSection id="algorithms" className="container mx-auto px-8 md:px-16 scroll-mt-8">
         <TopicCard
           title="ALGORITHMS"
           figureNumber="CHAPTER 05"
           description={`Algorithms are the recipes that computers follow. Sorting a list, searching for a value, or finding the shortest path – each problem has elegant solutions discovered over decades.
 
 Bubble sort is simple but slow. Quick sort is fast but complex. Understanding these trade-offs is fundamental to writing efficient code.`}
-          illustration={<SortingAlgorithmSVG />}
+          illustration={
+            <InteractiveSVGWrapper>
+              <SortingAlgorithmSVG />
+            </InteractiveSVGWrapper>
+          }
           isReversed
         />
       </ContentSection>
@@ -122,28 +145,36 @@ Bubble sort is simple but slow. Quick sort is fast but complex. Understanding th
       <SectionDivider />
 
       {/* Cryptography Section */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
+      <ContentSection id="cryptography" className="container mx-auto px-8 md:px-16 scroll-mt-8">
         <TopicCard
           title="CRYPTOGRAPHY"
           figureNumber="CHAPTER 06"
           description={`How do you send a secret message over the internet where anyone can listen? Cryptography transforms readable text into unbreakable ciphertext.
 
 Modern encryption like AES-256 is so strong that even with every computer on Earth working together, it would take longer than the age of the universe to crack.`}
-          illustration={<EncryptionSVG />}
+          illustration={
+            <InteractiveSVGWrapper>
+              <EncryptionSVG />
+            </InteractiveSVGWrapper>
+          }
         />
       </ContentSection>
 
       <SectionDivider />
 
       {/* Memory Section */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
+      <ContentSection id="memory" className="container mx-auto px-8 md:px-16 scroll-mt-8">
         <TopicCard
           title="MEMORY MANAGEMENT"
           figureNumber="CHAPTER 07"
           description={`Every variable you create, every object you instantiate – they all need a place to live in memory. Understanding how memory is allocated and freed is crucial for writing performant applications.
 
 From the stack to the heap, from pointers to garbage collection, memory management is the invisible force that makes your programs run.`}
-          illustration={<MemoryAllocationSVG />}
+          illustration={
+            <InteractiveSVGWrapper>
+              <MemoryAllocationSVG />
+            </InteractiveSVGWrapper>
+          }
           isReversed
         />
       </ContentSection>

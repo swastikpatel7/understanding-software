@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
-const MemoryAllocationSVG = () => {
+interface MemoryAllocationSVGProps {
+  isPaused?: boolean;
+}
+
+const MemoryAllocationSVG = ({ isPaused = false }: MemoryAllocationSVGProps) => {
   const [allocations, setAllocations] = useState([
     { id: 1, start: 0, size: 3, label: 'arr[]', active: false },
     { id: 2, start: 4, size: 2, label: 'ptr', active: false },
@@ -9,6 +13,8 @@ const MemoryAllocationSVG = () => {
   const [pointer, setPointer] = useState(0);
 
   useEffect(() => {
+    if (isPaused) return;
+    
     const interval = setInterval(() => {
       setAllocations(prev => {
         const newAllocs = [...prev];
@@ -30,7 +36,7 @@ const MemoryAllocationSVG = () => {
       clearInterval(interval);
       clearInterval(pointerInterval);
     };
-  }, []);
+  }, [isPaused]);
 
   const cellWidth = 22;
   const cellHeight = 30;
