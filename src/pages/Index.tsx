@@ -6,14 +6,14 @@ import TopicCard from '@/components/TopicCard';
 import Footer from '@/components/Footer';
 import TableOfContents from '@/components/TableOfContents';
 import InteractiveSVGWrapper from '@/components/illustrations/InteractiveSVGWrapper';
-import NeuralNetworkSVG from '@/components/illustrations/NeuralNetworkSVG';
-import BinaryTreeSVG from '@/components/illustrations/BinaryTreeSVG';
-import HTTPRequestSVG from '@/components/illustrations/HTTPRequestSVG';
+import CPUArchitectureSVG from '@/components/illustrations/CPUArchitectureSVG';
+import HashTableSVG from '@/components/illustrations/HashTableSVG';
+import NetworkPacketSVG from '@/components/illustrations/NetworkPacketSVG';
 import LayeredStackSVG from '@/components/illustrations/LayeredStackSVG';
-import DatabaseSVG from '@/components/illustrations/DatabaseSVG';
-import SortingAlgorithmSVG from '@/components/illustrations/SortingAlgorithmSVG';
-import EncryptionSVG from '@/components/illustrations/EncryptionSVG';
-import MemoryAllocationSVG from '@/components/illustrations/MemoryAllocationSVG';
+import DiskStorageSVG from '@/components/illustrations/DiskStorageSVG';
+import BTreeIndexSVG from '@/components/illustrations/BTreeIndexSVG';
+import EncryptionFlowSVG from '@/components/illustrations/EncryptionFlowSVG';
+import MemoryLayoutSVG from '@/components/illustrations/MemoryLayoutSVG';
 
 const Index = () => {
   return (
@@ -38,7 +38,7 @@ const Index = () => {
             </p>
 
             <InteractiveSVGWrapper>
-              <NeuralNetworkSVG />
+              <CPUArchitectureSVG />
             </InteractiveSVGWrapper>
 
             <p className="font-body leading-relaxed">
@@ -81,7 +81,7 @@ const Index = () => {
 Each node can have at most two children – a left child with a smaller value and a right child with a larger value. This simple rule creates a powerful searching mechanism.`}
           illustration={
             <InteractiveSVGWrapper>
-              <BinaryTreeSVG />
+              <HashTableSVG />
             </InteractiveSVGWrapper>
           }
         />
@@ -99,7 +99,7 @@ Each node can have at most two children – a left child with a smaller value an
 Every interaction you have with a website involves this dance of requests and responses – GET, POST, PUT, DELETE – each with its own purpose and protocol.`}
           illustration={
             <InteractiveSVGWrapper>
-              <HTTPRequestSVG />
+              <NetworkPacketSVG />
             </InteractiveSVGWrapper>
           }
           isReversed
@@ -118,7 +118,7 @@ Every interaction you have with a website involves this dance of requests and re
 Relational databases organize data into tables with rows and columns, using SQL to query information. Each query is optimized, indexed, and executed in milliseconds.`}
           illustration={
             <InteractiveSVGWrapper>
-              <DatabaseSVG />
+              <DiskStorageSVG />
             </InteractiveSVGWrapper>
           }
         />
@@ -136,7 +136,7 @@ Relational databases organize data into tables with rows and columns, using SQL 
 Bubble sort is simple but slow. Quick sort is fast but complex. Understanding these trade-offs is fundamental to writing efficient code.`}
           illustration={
             <InteractiveSVGWrapper>
-              <SortingAlgorithmSVG />
+              <BTreeIndexSVG />
             </InteractiveSVGWrapper>
           }
           isReversed
@@ -155,7 +155,7 @@ Bubble sort is simple but slow. Quick sort is fast but complex. Understanding th
 Modern encryption like AES-256 is so strong that even with every computer on Earth working together, it would take longer than the age of the universe to crack.`}
           illustration={
             <InteractiveSVGWrapper>
-              <EncryptionSVG />
+              <EncryptionFlowSVG />
             </InteractiveSVGWrapper>
           }
         />
@@ -173,7 +173,7 @@ Modern encryption like AES-256 is so strong that even with every computer on Ear
 From the stack to the heap, from pointers to garbage collection, memory management is the invisible force that makes your programs run.`}
           illustration={
             <InteractiveSVGWrapper>
-              <MemoryAllocationSVG />
+              <MemoryLayoutSVG />
             </InteractiveSVGWrapper>
           }
           isReversed
