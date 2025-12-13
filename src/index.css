@@ -6,11 +6,11 @@
 
 @layer base {
   :root {
-    /* Light cream/white theme */
-    --background: 40 33% 98%;
+    /* Clean white theme */
+    --background: 0 0% 100%;
     --foreground: 220 30% 15%;
 
-    --card: 40 20% 96%;
+    --card: 220 15% 97%;
     --card-foreground: 220 30% 15%;
 
     --popover: 0 0% 100%;
@@ -24,7 +24,7 @@
     --secondary: 226 50% 95%;
     --secondary-foreground: 226 71% 40%;
 
-    --muted: 40 20% 94%;
+    --muted: 220 15% 94%;
     --muted-foreground: 220 15% 45%;
 
     --accent: 226 71% 56%;
@@ -34,7 +34,7 @@
     --destructive-foreground: 0 0% 100%;
 
     --border: 226 30% 85%;
-    --input: 40 20% 96%;
+    --input: 220 15% 96%;
     --ring: 226 71% 56%;
 
     --radius: 0.5rem;
