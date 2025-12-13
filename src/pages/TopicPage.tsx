@@ -1,4 +1,4 @@
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight, Loader2, List } from 'lucide-react';
 import Header from '@/components/Header';
@@ -7,7 +7,8 @@ import SectionDivider from '@/components/SectionDivider';
 import ContentSection from '@/components/ContentSection';
 import { supabase } from '@/integrations/supabase/client';
 import ReactMarkdown from 'react-markdown';
-import TopicIllustration from '@/components/TopicIllustration';
+import { getTopicIllustrations } from '@/components/TopicIllustration';
+import InteractiveSVGWrapper from '@/components/illustrations/InteractiveSVGWrapper';
 
 interface Topic {
   id: string;
@@ -29,7 +30,6 @@ interface Chapter {
 
 const TopicPage = () => {
   const { chapterSlug, topicSlug } = useParams();
-  const navigate = useNavigate();
 
   // Fetch current chapter
   const { data: chapter, isLoading: chapterLoading } = useQuery({
@@ -71,18 +71,22 @@ const TopicPage = () => {
 
   const isLoading = chapterLoading || topicsLoading;
 
-  // Clean content for reading - remove code blocks and tables
-  const cleanContent = (content: string) => {
-    return content
-      // Remove code blocks
+  // Parse content into sections with illustrations
+  const parseContentWithIllustrations = (content: string, illustrationKey: string | null) => {
+    const illustrations = getTopicIllustrations(illustrationKey);
+    
+    // Clean content - remove code blocks and tables
+    const cleanedContent = content
       .replace(/```[\s\S]*?```/g, '')
-      // Remove markdown tables (lines starting with |)
       .replace(/^\|.*\|$/gm, '')
-      // Remove table separator lines
       .replace(/^\s*[-:|\s]+$/gm, '')
-      // Clean up excessive newlines
       .replace(/\n{3,}/g, '\n\n')
       .trim();
+
+    // Split content by h2 headers
+    const sections = cleanedContent.split(/(?=##\s)/);
+    
+    return { sections, illustrations };
   };
 
   if (isLoading) {
@@ -121,6 +125,11 @@ const TopicPage = () => {
     );
   }
 
+  const { sections, illustrations } = parseContentWithIllustrations(
+    currentTopic.content,
+    currentTopic.illustration_key
+  );
+
   return (
     <div className="min-h-screen relative">
       <Header />
@@ -143,86 +152,70 @@ const TopicPage = () => {
           </div>
 
           {/* Section Header */}
-          <div className="text-center mb-12">
-            <span className="font-mono text-lg text-primary/70 block mb-2">
+          <div className="text-center mb-8">
+            <span className="font-mono text-sm text-primary/70 block mb-2">
               Section {currentTopic.section_number}
             </span>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-primary">
+            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-primary tracking-wide">
               {currentTopic.title.toUpperCase()}
             </h1>
           </div>
         </div>
       </ContentSection>
 
-      {/* Main Illustration */}
+      {/* Main Content with Inline Illustrations */}
       <ContentSection className="container mx-auto px-8 md:px-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="aspect-video bg-card/30 border border-border/50 rounded-lg overflow-hidden flex items-center justify-center p-8">
-            <TopicIllustration illustrationKey={currentTopic.illustration_key} />
+        <div className="max-w-5xl mx-auto">
+          
+          {/* Hero Section with Main Illustration */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
+            <div className="space-y-4">
+              <ReactMarkdown components={markdownComponents}>
+                {sections[0] || ''}
+              </ReactMarkdown>
+            </div>
+            <div className="flex items-start">
+              <div className="w-full bg-card/30 border border-border/30 rounded-lg p-4">
+                <InteractiveSVGWrapper>
+                  {illustrations.main}
+                </InteractiveSVGWrapper>
+              </div>
+            </div>
           </div>
-        </div>
-      </ContentSection>
 
-      <SectionDivider />
+          {/* Content Sections with Alternating Illustrations */}
+          {sections.slice(1).map((section, index) => {
+            const inlineIllustration = illustrations.inline[index % illustrations.inline.length];
+            const isReversed = index % 2 === 1;
 
-      {/* Content */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
-        <div className="max-w-3xl mx-auto topic-content">
-          <ReactMarkdown
-            components={{
-              h2: ({ children }) => (
-                <h2 className="font-display text-2xl text-primary mt-12 mb-6 uppercase tracking-wide">
-                  {children}
-                </h2>
-              ),
-              h3: ({ children }) => (
-                <h3 className="font-display text-xl text-primary mt-8 mb-4 uppercase tracking-wide">
-                  {children}
-                </h3>
-              ),
-              h4: ({ children }) => (
-                <h4 className="font-display text-lg text-primary mt-6 mb-3 uppercase tracking-wide">
-                  {children}
-                </h4>
-              ),
-              p: ({ children }) => (
-                <p className="font-body text-lg text-foreground leading-relaxed mb-6">
-                  {children}
-                </p>
-              ),
-              strong: ({ children }) => (
-                <strong className="text-primary font-semibold">{children}</strong>
-              ),
-              em: ({ children }) => (
-                <em className="text-foreground/80 italic">{children}</em>
-              ),
-              ul: ({ children }) => (
-                <ul className="font-body text-lg text-foreground/90 leading-relaxed mb-6 ml-6 list-disc marker:text-primary">
-                  {children}
-                </ul>
-              ),
-              ol: ({ children }) => (
-                <ol className="font-body text-lg text-foreground/90 leading-relaxed mb-6 ml-6 list-decimal marker:text-primary">
-                  {children}
-                </ol>
-              ),
-              li: ({ children }) => (
-                <li className="mb-2">{children}</li>
-              ),
-              a: ({ href, children }) => (
-                <a href={href} className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
-                  {children}
-                </a>
-              ),
-              code: ({ children }) => (
-                <code className="font-mono text-sm bg-card/50 text-primary px-1.5 py-0.5 rounded border border-border/50">
-                  {children}
-                </code>
-              ),
-            }}
-          >
-            {cleanContent(currentTopic.content)}
-          </ReactMarkdown>
+            return (
+              <div 
+                key={index} 
+                className={`grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 mb-10 ${isReversed ? 'lg:flex-row-reverse' : ''}`}
+              >
+                {/* Text Content - Takes 2 columns */}
+                <div className={`lg:col-span-2 ${isReversed ? 'lg:order-2' : 'lg:order-1'}`}>
+                  <ReactMarkdown components={markdownComponents}>
+                    {section}
+                  </ReactMarkdown>
+                </div>
+                
+                {/* Illustration - Takes 1 column */}
+                {inlineIllustration && (
+                  <div className={`lg:col-span-1 ${isReversed ? 'lg:order-1' : 'lg:order-2'}`}>
+                    <div className="sticky top-24 bg-card/30 border border-border/30 rounded-lg p-4">
+                      <InteractiveSVGWrapper>
+                        {inlineIllustration.component}
+                      </InteractiveSVGWrapper>
+                      <p className="text-center text-xs text-muted-foreground mt-2 font-mono uppercase tracking-wide">
+                        {inlineIllustration.title}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </ContentSection>
 
@@ -232,7 +225,7 @@ const TopicPage = () => {
       <ContentSection className="container mx-auto px-8 md:px-16">
         <div className="max-w-4xl mx-auto">
           <div className="border border-border/50 rounded-lg bg-card/30 p-6">
-            <h3 className="font-display text-sm text-muted-foreground uppercase tracking-widest mb-4">
+            <h3 className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-4">
               In This Chapter
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -269,7 +262,7 @@ const TopicPage = () => {
                   <ArrowLeft className="w-4 h-4" />
                   <span className="font-mono text-xs uppercase tracking-wider">Previous</span>
                 </div>
-                <p className="font-display text-lg text-foreground group-hover:text-primary transition-colors">
+                <p className="text-lg text-foreground group-hover:text-primary transition-colors">
                   {prevTopic.title}
                 </p>
               </Link>
@@ -286,7 +279,7 @@ const TopicPage = () => {
                   <span className="font-mono text-xs uppercase tracking-wider">Next</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
-                <p className="font-display text-lg text-foreground group-hover:text-primary transition-colors">
+                <p className="text-lg text-foreground group-hover:text-primary transition-colors">
                   {nextTopic.title}
                 </p>
               </Link>
@@ -299,7 +292,7 @@ const TopicPage = () => {
                   <span className="font-mono text-xs uppercase tracking-wider">Completed</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
-                <p className="font-display text-lg text-primary group-hover:text-primary-foreground transition-colors">
+                <p className="text-lg text-primary group-hover:text-primary-foreground transition-colors">
                   View All Chapters
                 </p>
               </Link>
@@ -312,6 +305,59 @@ const TopicPage = () => {
       <Footer />
     </div>
   );
+};
+
+// Consistent markdown components with readable typography
+const markdownComponents = {
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <h2 className="text-xl font-semibold text-primary mt-8 mb-4 tracking-wide">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => (
+    <h3 className="text-lg font-semibold text-primary mt-6 mb-3">
+      {children}
+    </h3>
+  ),
+  h4: ({ children }: { children?: React.ReactNode }) => (
+    <h4 className="text-base font-semibold text-foreground mt-4 mb-2">
+      {children}
+    </h4>
+  ),
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <p className="text-base text-foreground/90 leading-relaxed mb-4">
+      {children}
+    </p>
+  ),
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="text-primary font-semibold">{children}</strong>
+  ),
+  em: ({ children }: { children?: React.ReactNode }) => (
+    <em className="text-foreground/80 italic">{children}</em>
+  ),
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul className="text-base text-foreground/90 leading-relaxed mb-4 ml-5 list-disc marker:text-primary/60">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <ol className="text-base text-foreground/90 leading-relaxed mb-4 ml-5 list-decimal marker:text-primary/60">
+      {children}
+    </ol>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <li className="mb-1.5">{children}</li>
+  ),
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <a href={href} className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
+      {children}
+    </a>
+  ),
+  code: ({ children }: { children?: React.ReactNode }) => (
+    <code className="font-mono text-sm bg-muted/50 text-primary px-1.5 py-0.5 rounded">
+      {children}
+    </code>
+  ),
 };
 
 export default TopicPage;
