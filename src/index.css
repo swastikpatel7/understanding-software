@@ -6,78 +6,78 @@
 
 @layer base {
   :root {
-    /* Dark black theme */
-    --background: 0 0% 4%;
-    --foreground: 0 0% 95%;
+    /* Clean white theme */
+    --background: 0 0% 100%;
+    --foreground: 220 30% 15%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 95%;
+    --card: 220 15% 97%;
+    --card-foreground: 220 30% 15%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 15%;
 
-    /* Warm white/cream primary */
-    --primary: 45 10% 85%;
-    --primary-foreground: 0 0% 4%;
+    /* Blueprint blue primary */
+    --primary: 226 71% 56%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Muted gray secondary */
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 80%;
+    /* Light blue secondary */
+    --secondary: 226 50% 95%;
+    --secondary-foreground: 226 71% 40%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 15% 45%;
 
-    --accent: 45 10% 85%;
-    --accent-foreground: 0 0% 4%;
+    --accent: 226 71% 56%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 10%;
-    --ring: 45 10% 85%;
+    --border: 226 30% 85%;
+    --input: 220 15% 96%;
+    --ring: 226 71% 56%;
 
     --radius: 0.5rem;
 
-    /* Custom tokens - monochrome */
-    --blueprint: 0 0% 70%;
-    --blueprint-light: 0 0% 50%;
-    --blueprint-dark: 0 0% 85%;
-    --dot-color: 0 0% 20%;
-    --line-color: 0 0% 30%;
+    /* Custom tokens */
+    --blueprint: 226 71% 56%;
+    --blueprint-light: 226 50% 75%;
+    --blueprint-dark: 226 71% 40%;
+    --dot-color: 226 30% 80%;
+    --line-color: 226 40% 70%;
   }
 
   .dark {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 95%;
+    --background: 220 25% 8%;
+    --foreground: 40 33% 98%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 95%;
+    --card: 220 25% 12%;
+    --card-foreground: 40 33% 98%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 220 25% 10%;
+    --popover-foreground: 40 33% 98%;
 
-    --primary: 45 10% 85%;
-    --primary-foreground: 0 0% 4%;
+    --primary: 226 71% 65%;
+    --primary-foreground: 220 25% 8%;
 
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 80%;
+    --secondary: 226 30% 20%;
+    --secondary-foreground: 226 71% 75%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 15% 60%;
 
-    --accent: 45 10% 85%;
-    --accent-foreground: 0 0% 4%;
+    --accent: 226 71% 65%;
+    --accent-foreground: 220 25% 8%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 10%;
-    --ring: 45 10% 85%;
+    --border: 226 30% 25%;
+    --input: 220 25% 15%;
+    --ring: 226 71% 65%;
 
-    --blueprint: 0 0% 70%;
-    --blueprint-light: 0 0% 50%;
-    --blueprint-dark: 0 0% 85%;
-    --dot-color: 0 0% 20%;
-    --line-color: 0 0% 30%;
+    --blueprint: 226 71% 65%;
+    --blueprint-light: 226 50% 50%;
+    --blueprint-dark: 226 71% 75%;
+    --dot-color: 226 30% 30%;
+    --line-color: 226 40% 40%;
   }
 }
 
