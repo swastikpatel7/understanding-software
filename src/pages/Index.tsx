@@ -1,69 +1,88 @@
-import { Link } from 'react-router-dom';
-import Header from '@/components/Header';
-import SectionDivider from '@/components/SectionDivider';
-import ContentSection from '@/components/ContentSection';
-import TopicCard from '@/components/TopicCard';
-import Footer from '@/components/Footer';
-import TableOfContents from '@/components/TableOfContents';
-import InteractiveSVGWrapper from '@/components/illustrations/InteractiveSVGWrapper';
-import CPUArchitectureSVG from '@/components/illustrations/CPUArchitectureSVG';
-import HashTableSVG from '@/components/illustrations/HashTableSVG';
-import NetworkPacketSVG from '@/components/illustrations/NetworkPacketSVG';
-import LayeredStackSVG from '@/components/illustrations/LayeredStackSVG';
-import DiskStorageSVG from '@/components/illustrations/DiskStorageSVG';
-import BTreeIndexSVG from '@/components/illustrations/BTreeIndexSVG';
-import EncryptionFlowSVG from '@/components/illustrations/EncryptionFlowSVG';
-import MemoryLayoutSVG from '@/components/illustrations/MemoryLayoutSVG';
+import { Link } from "react-router-dom";
+import Header from "@/components/Header";
+import SectionDivider from "@/components/SectionDivider";
+import ContentSection from "@/components/ContentSection";
+import Footer from "@/components/Footer";
+import TableOfContents from "@/components/TableOfContents";
+import LayerCard from "@/components/LayerCard";
+import InteractiveSVGWrapper from "@/components/illustrations/InteractiveSVGWrapper";
+import SoftwareStackBannerSVG from "@/components/illustrations/SoftwareStackBannerSVG";
+import { LAYERS, getAvailableLayers, getComingSoonLayers } from "@/content/layers";
 
 const Index = () => {
+  const availableLayers = getAvailableLayers();
+  const comingSoonLayers = getComingSoonLayers();
+
   return (
     <div className="min-h-screen relative">
       <Header />
-      <TableOfContents />
-      
+      <TableOfContents
+        items={[
+          { id: "intro", label: "Overview", number: "00" },
+          { id: "philosophy", label: "Philosophy", number: "01" },
+          { id: "layers", label: "The Stack", number: "02" },
+          { id: "roadmap", label: "Roadmap", number: "03" },
+        ]}
+      />
+
       <SectionDivider />
 
-      {/* Hero Introduction */}
+      {/* Hero Section */}
       <ContentSection id="intro" className="container mx-auto px-8 md:px-16 scroll-mt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
-          {/* Left column - Intro text */}
-          <div className="space-y-6">
-            <p className="font-body text-lg leading-relaxed">
-              <span className="text-4xl font-body float-left mr-2 leading-none text-primary">H</span>
-              ave you ever wondered how a neural network learns? Well, it's not magic – it's mathematics. Each connection between nodes carries a weight, and during training, these weights are adjusted thousands of times.
-            </p>
-            
-            <p className="font-body leading-relaxed text-muted-foreground">
-              The network learns by making predictions, comparing them to the expected output, and then adjusting the weights to reduce the error. This process, called backpropagation, is at the heart of modern AI.
-            </p>
+        <div className="mb-12">
+          <InteractiveSVGWrapper className="w-full">
+            <SoftwareStackBannerSVG />
+          </InteractiveSVGWrapper>
+        </div>
 
-            <InteractiveSVGWrapper>
-              <CPUArchitectureSVG />
-            </InteractiveSVGWrapper>
-
-            <p className="font-body leading-relaxed">
-              Understanding these fundamentals isn't just academic – it changes how you think about the software you use every day.
-            </p>
-          </div>
-
-          {/* Right column - Main illustration */}
-          <div className="space-y-8">
-            <InteractiveSVGWrapper>
-              <LayeredStackSVG />
-            </InteractiveSVGWrapper>
-            
-            <div className="space-y-4 mt-8">
-              <p className="font-body text-lg font-semibold text-foreground">
-                If you've ever wondered about any of these things or if they've sparked your curiosity, then this is for you.
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+            <div className="space-y-6">
+              <p className="font-body text-lg leading-relaxed">
+                <span className="text-4xl font-body float-left mr-2 leading-none text-primary">
+                  S
+                </span>
+                oftware is layers. From transistors to transformers, each layer
+                builds on the last—hiding complexity, enabling abstraction,
+                creating the systems we use every day.
               </p>
-              
+
               <p className="font-body leading-relaxed text-muted-foreground">
-                This won't teach you how to actually make software – it's not a tutorial or a guide but rather something more interesting than that. It's a manual that explains how the things you use everyday actually work.
+                Code Blueprint is a visual blueprint of the full stack.
+                Not tutorials. Not code snippets. The actual mechanisms—how
+                things work, why they break, and the trade-offs that shape every
+                system.
               </p>
-              
+            </div>
+
+            <div className="space-y-6">
               <p className="font-body leading-relaxed text-muted-foreground">
-                As everything around us has become more complicated our understanding of technology has diminished. It used to be that we needed to understand our tools deeply but today we understand them in a shallow, abstracted way.
+                This is for builders who want to understand, not just use. When
+                you can explain the mechanism, you can debug the abstraction.
               </p>
+
+              <div className="border border-border/50 rounded-none bg-card/30 backdrop-blur-sm p-6">
+                <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-4">
+                  The Journey
+                </p>
+                <div className="space-y-2 font-mono text-xs">
+                  <div className="flex items-center gap-3">
+                    <span className="text-primary w-4">0</span>
+                    <span className="text-muted-foreground">→</span>
+                    <span>Transistors & Logic Gates</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-primary w-4">↓</span>
+                    <span className="text-muted-foreground"></span>
+                    <span className="text-muted-foreground text-[10px]">abstraction</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-primary w-4">9</span>
+                    <span className="text-muted-foreground">→</span>
+                    <span>Quantum Computing & AI</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -71,136 +90,213 @@ const Index = () => {
 
       <SectionDivider />
 
-      {/* Data Structures Section */}
-      <ContentSection id="data-structures" className="container mx-auto px-8 md:px-16 scroll-mt-8">
-        <TopicCard
-          title="DATA STRUCTURES"
-          figureNumber="CHAPTER 02"
-          description={`Maybe you've always wanted to know how data is organized in memory. Binary trees, for instance, are elegant structures that allow for incredibly fast searching.
+      {/* Philosophy Section */}
+      <ContentSection id="philosophy" className="container mx-auto px-8 md:px-16 scroll-mt-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center gap-3 mb-10">
+            <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
+              Engineering Blueprint, Not Tutorial
+            </span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
 
-Each node can have at most two children – a left child with a smaller value and a right child with a larger value. This simple rule creates a powerful searching mechanism.`}
-          illustration={
-            <InteractiveSVGWrapper>
-              <HashTableSVG />
-            </InteractiveSVGWrapper>
-          }
-        />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="border border-border/50 rounded-none bg-card/30 p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="font-mono text-xs text-muted-foreground line-through">Tutorial Site</span>
+              </div>
+              <ul className="space-y-2 font-body text-sm text-muted-foreground">
+                <li>"How to implement X"</li>
+                <li>Step-by-step instructions</li>
+                <li>Code snippets to copy</li>
+                <li>"Use this library"</li>
+              </ul>
+            </div>
+
+            <div className="border border-primary rounded-none bg-card/30 p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="font-mono text-xs text-primary uppercase tracking-wider">This Site</span>
+              </div>
+              <ul className="space-y-2 font-body text-sm text-foreground">
+                <li>"How X works underneath"</li>
+                <li>First-principles reasoning</li>
+                <li>Mental models to internalize</li>
+                <li>Trade-offs and constraints</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                number: "01",
+                title: "Mechanism First",
+                body: "What's stored, what changes, what invariants hold. We explain the moving parts before the patterns.",
+              },
+              {
+                number: "02",
+                title: "Visual Anchors",
+                body: "Strong diagrams beat walls of text. Every concept has an illustration that shows the structure.",
+              },
+              {
+                number: "03",
+                title: "Trade-offs Always",
+                body: "Nothing is free. Every design choice has costs—we show them so you can reason about alternatives.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="border border-border/50 rounded-none bg-card/30 backdrop-blur-sm p-6"
+              >
+                <span className="font-mono text-[10px] text-muted-foreground">{item.number}</span>
+                <h3 className="font-display text-lg text-primary mb-3 mt-1">{item.title}</h3>
+                <p className="font-body text-sm text-muted-foreground leading-relaxed">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </ContentSection>
 
       <SectionDivider />
 
-      {/* Web Development Section */}
-      <ContentSection id="web" className="container mx-auto px-8 md:px-16 scroll-mt-8">
-        <TopicCard
-          title="HOW THE WEB WORKS"
-          figureNumber="CHAPTER 03"
-          description={`Or perhaps you've wondered what happens when you type a URL into your browser. The request travels through cables and routers, finds its way to a server, and returns with the data you requested.
+      {/* Layers Section */}
+      <ContentSection id="layers" className="container mx-auto px-8 md:px-16 scroll-mt-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="space-y-3 mb-10">
+            <div className="flex items-center gap-3">
+              <h2 className="font-display text-2xl md:text-3xl text-primary">THE STACK</h2>
+              <div className="h-px flex-1 bg-border" />
+              <span className="font-mono text-xs text-muted-foreground">
+                {LAYERS.length} LAYERS
+              </span>
+            </div>
+            <p className="font-body text-muted-foreground leading-relaxed max-w-3xl">
+              From silicon to intelligence. Each layer builds on the last, hiding complexity
+              and enabling the next level of abstraction.
+            </p>
+          </div>
 
-Every interaction you have with a website involves this dance of requests and responses – GET, POST, PUT, DELETE – each with its own purpose and protocol.`}
-          illustration={
-            <InteractiveSVGWrapper>
-              <NetworkPacketSVG />
-            </InteractiveSVGWrapper>
-          }
-          isReversed
-        />
+          {/* Available Layers */}
+          <div className="mb-12">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-primary">
+                Available Now
+              </span>
+              <div className="h-px flex-1 bg-primary/30" />
+              <span className="font-mono text-[10px] text-primary">
+                {availableLayers.length} layers
+              </span>
+            </div>
+
+            <div className="space-y-4">
+              {availableLayers.map((layer) => (
+                <LayerCard key={layer.slug} layer={layer} />
+              ))}
+            </div>
+          </div>
+
+          {/* Coming Soon Layers */}
+          <div>
+            <div className="flex items-center gap-2 mb-6">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                Coming Soon
+              </span>
+              <div className="h-px flex-1 bg-border/50" />
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {comingSoonLayers.length} layers
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {comingSoonLayers.map((layer) => (
+                <div
+                  key={layer.slug}
+                  className="relative border border-border/30 bg-card/10 p-5"
+                >
+                  {/* Layer number */}
+                  <div className="absolute -left-px -top-px w-10 h-10 flex items-center justify-center border-r border-b border-border/30 bg-muted/30 text-muted-foreground">
+                    <span className="font-mono text-sm">{layer.number}</span>
+                  </div>
+
+                  <div className="pl-12">
+                    <h3 className="font-display text-base text-muted-foreground uppercase tracking-wide mb-1">
+                      {layer.title}
+                    </h3>
+                    <p className="font-mono text-[10px] text-muted-foreground/70 italic mb-2">
+                      "{layer.tagline}"
+                    </p>
+                    <p className="font-body text-xs text-muted-foreground/80 leading-relaxed">
+                      {layer.chapters.length} chapters planned
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </ContentSection>
 
       <SectionDivider />
 
-      {/* Databases Section */}
-      <ContentSection id="databases" className="container mx-auto px-8 md:px-16 scroll-mt-8">
-        <TopicCard
-          title="DATABASES & STORAGE"
-          figureNumber="CHAPTER 04"
-          description={`Where does your data actually live? Databases are the backbone of every application, storing everything from your profile picture to your banking transactions.
+      {/* Roadmap / Progress Section */}
+      <ContentSection id="roadmap" className="container mx-auto px-8 md:px-16 scroll-mt-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-3 mb-10">
+            <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
+              Progress
+            </span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
 
-Relational databases organize data into tables with rows and columns, using SQL to query information. Each query is optimized, indexed, and executed in milliseconds.`}
-          illustration={
-            <InteractiveSVGWrapper>
-              <DiskStorageSVG />
-            </InteractiveSVGWrapper>
-          }
-        />
-      </ContentSection>
+          {/* Visual progress bar */}
+          <div className="mb-10">
+            <div className="flex items-center gap-1 mb-3">
+              {LAYERS.map((layer) => (
+                <div
+                  key={layer.number}
+                  className={`flex-1 h-8 flex items-center justify-center border ${
+                    layer.status === "available"
+                      ? "border-primary bg-primary/20 text-primary"
+                      : "border-border/30 bg-muted/10 text-muted-foreground/50"
+                  }`}
+                >
+                  <span className="font-mono text-xs">{layer.number}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between font-mono text-[10px] text-muted-foreground">
+              <span>Hardware</span>
+              <span>{Math.round((availableLayers.length / LAYERS.length) * 100)}% Complete</span>
+              <span>Frontier</span>
+            </div>
+          </div>
 
-      <SectionDivider />
+          <div className="text-center space-y-6">
+            <p className="font-body text-muted-foreground leading-relaxed">
+              Layer 0 and Layer 1 are ready. The remaining 8 layers are in development.
+              Follow along as we build out the complete stack.
+            </p>
 
-      {/* Algorithms Section */}
-      <ContentSection id="algorithms" className="container mx-auto px-8 md:px-16 scroll-mt-8">
-        <TopicCard
-          title="ALGORITHMS"
-          figureNumber="CHAPTER 05"
-          description={`Algorithms are the recipes that computers follow. Sorting a list, searching for a value, or finding the shortest path – each problem has elegant solutions discovered over decades.
-
-Bubble sort is simple but slow. Quick sort is fast but complex. Understanding these trade-offs is fundamental to writing efficient code.`}
-          illustration={
-            <InteractiveSVGWrapper>
-              <BTreeIndexSVG />
-            </InteractiveSVGWrapper>
-          }
-          isReversed
-        />
-      </ContentSection>
-
-      <SectionDivider />
-
-      {/* Cryptography Section */}
-      <ContentSection id="cryptography" className="container mx-auto px-8 md:px-16 scroll-mt-8">
-        <TopicCard
-          title="CRYPTOGRAPHY"
-          figureNumber="CHAPTER 06"
-          description={`How do you send a secret message over the internet where anyone can listen? Cryptography transforms readable text into unbreakable ciphertext.
-
-Modern encryption like AES-256 is so strong that even with every computer on Earth working together, it would take longer than the age of the universe to crack.`}
-          illustration={
-            <InteractiveSVGWrapper>
-              <EncryptionFlowSVG />
-            </InteractiveSVGWrapper>
-          }
-        />
-      </ContentSection>
-
-      <SectionDivider />
-
-      {/* Memory Section */}
-      <ContentSection id="memory" className="container mx-auto px-8 md:px-16 scroll-mt-8">
-        <TopicCard
-          title="MEMORY MANAGEMENT"
-          figureNumber="CHAPTER 07"
-          description={`Every variable you create, every object you instantiate – they all need a place to live in memory. Understanding how memory is allocated and freed is crucial for writing performant applications.
-
-From the stack to the heap, from pointers to garbage collection, memory management is the invisible force that makes your programs run.`}
-          illustration={
-            <InteractiveSVGWrapper>
-              <MemoryLayoutSVG />
-            </InteractiveSVGWrapper>
-          }
-          isReversed
-        />
-      </ContentSection>
-
-      <SectionDivider />
-
-      {/* Call to Action */}
-      <ContentSection className="container mx-auto px-8 md:px-16">
-        <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h2 className="font-display text-2xl md:text-3xl text-primary">
-            START EXPLORING
-          </h2>
-          <p className="font-body text-lg text-muted-foreground leading-relaxed">
-            It won't make you a better designer or programmer tomorrow – there's nothing actionable in here. But knowing how things work comes in handy when you find yourself out of your depth.
-          </p>
-          <p className="font-body italic text-muted-foreground">
-            Or at the very least, you can pretend to be smart in front of your friends.
-          </p>
-          
-          <Link 
-            to="/chapters" 
-            className="mt-8 inline-block px-8 py-3 border-2 border-primary text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-          >
-            Begin Reading
-          </Link>
+            <Link
+              to="/layer/the-machine"
+              className="inline-flex items-center gap-2 px-8 py-3 border-2 border-primary text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+            >
+              Begin at Layer 0
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
+          </div>
         </div>
       </ContentSection>
 
