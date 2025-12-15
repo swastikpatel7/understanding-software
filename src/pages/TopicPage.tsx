@@ -1,122 +1,145 @@
-import { Link, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, Loader2, List } from 'lucide-react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import SectionDivider from '@/components/SectionDivider';
-import ContentSection from '@/components/ContentSection';
-import { supabase } from '@/integrations/supabase/client';
-import ReactMarkdown from 'react-markdown';
-import { getTopicIllustrations } from '@/components/TopicIllustration';
-import InteractiveSVGWrapper from '@/components/illustrations/InteractiveSVGWrapper';
+import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, ArrowRight, List } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import SectionDivider from "@/components/SectionDivider";
+import ContentSection from "@/components/ContentSection";
+import ReactMarkdown from "react-markdown";
+import InteractiveSVGWrapper from "@/components/illustrations/InteractiveSVGWrapper";
+import { getLayerBySlug } from "@/content/layers";
+import {
+  DIGITAL_LOGIC_TOPICS,
+  TopicContent,
+} from "@/content/topics/digital-logic";
+import { getDigitalLogicIllustrations } from "@/content/illustrations/digital-logic-illustrations";
 
-interface Topic {
+type ParsedSection = {
   id: string;
   title: string;
-  slug: string;
-  section_number: string;
-  content: string;
-  illustration_key: string | null;
-  sort_order: number;
-  chapter_id: string;
-}
+  body: string;
+};
 
-interface Chapter {
-  id: string;
-  title: string;
-  slug: string;
-  chapter_number: number;
-}
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{L}\p{N}\s-]/gu, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+
+// Markdown components with custom styling
+const markdownComponents = {
+  h1: ({ children }: { children?: React.ReactNode }) => (
+    <h1 className="text-2xl font-display text-primary mt-8 mb-4 tracking-wide uppercase">
+      {children}
+    </h1>
+  ),
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <h2 className="text-xl font-display text-primary mt-8 mb-4 tracking-wide">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => (
+    <h3 className="text-lg font-semibold text-primary mt-6 mb-3">{children}</h3>
+  ),
+  h4: ({ children }: { children?: React.ReactNode }) => (
+    <h4 className="text-base font-semibold text-foreground mt-4 mb-2">
+      {children}
+    </h4>
+  ),
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <p className="text-base text-foreground/90 leading-relaxed mb-4 font-body">
+      {children}
+    </p>
+  ),
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="text-primary font-semibold">{children}</strong>
+  ),
+  em: ({ children }: { children?: React.ReactNode }) => (
+    <em className="text-foreground/80 italic">{children}</em>
+  ),
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul className="list-disc ml-6 mb-4 space-y-1 marker:text-primary/50 font-body">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <ol className="list-decimal ml-6 mb-4 space-y-1 marker:text-primary/50 font-body">
+      {children}
+    </ol>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <li className="text-foreground/90 leading-relaxed">{children}</li>
+  ),
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <a
+      href={href}
+      className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
+    >
+      {children}
+    </a>
+  ),
+  pre: ({ children }: { children?: React.ReactNode }) => (
+    <pre className="bg-muted/30 border border-border/50 rounded-lg p-4 overflow-x-auto mb-4 text-sm font-mono">
+      {children}
+    </pre>
+  ),
+  code: ({
+    inline,
+    children,
+  }: {
+    inline?: boolean;
+    children?: React.ReactNode;
+  }) =>
+    inline ? (
+      <code className="bg-muted/50 px-1.5 py-0.5 rounded text-sm font-mono text-primary">
+        {children}
+      </code>
+    ) : (
+      <code className="font-mono text-sm">{children}</code>
+    ),
+  blockquote: ({ children }: { children?: React.ReactNode }) => (
+    <blockquote className="border-l-2 border-primary/30 pl-4 italic text-foreground/70 mb-4">
+      {children}
+    </blockquote>
+  ),
+  hr: () => <hr className="my-8 border-border/60" />,
+};
 
 const TopicPage = () => {
-  const { chapterSlug, topicSlug } = useParams();
+  const { layerSlug, chapterSlug, topicSlug } = useParams();
 
-  // Fetch current chapter
-  const { data: chapter, isLoading: chapterLoading } = useQuery({
-    queryKey: ['chapter', chapterSlug],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('chapters')
-        .select('*')
-        .eq('slug', chapterSlug)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return data as Chapter;
-    },
-    enabled: !!chapterSlug
-  });
+  // Get layer and chapter data
+  const layer = getLayerBySlug(layerSlug || "");
+  const chapter = layer?.chapters.find((c) => c.slug === chapterSlug);
 
-  // Fetch all topics for this chapter
-  const { data: allTopics, isLoading: topicsLoading } = useQuery({
-    queryKey: ['chapter-topics', chapter?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('topics')
-        .select('*')
-        .eq('chapter_id', chapter!.id)
-        .order('sort_order');
-      
-      if (error) throw error;
-      return data as Topic[];
-    },
-    enabled: !!chapter?.id
-  });
+  // Get all topics for this chapter
+  const allTopics = getTopicsForChapter(chapterSlug || "");
 
-  // Current topic
-  const currentTopic = allTopics?.find(t => t.slug === topicSlug);
-  const currentIndex = allTopics?.findIndex(t => t.slug === topicSlug) ?? -1;
-  const prevTopic = currentIndex > 0 ? allTopics?.[currentIndex - 1] : null;
-  const nextTopic = currentIndex < (allTopics?.length ?? 0) - 1 ? allTopics?.[currentIndex + 1] : null;
+  // Find current topic
+  const currentTopic = allTopics.find((t) => t.slug === topicSlug);
+  const currentIndex = allTopics.findIndex((t) => t.slug === topicSlug);
+  const prevTopic = currentIndex > 0 ? allTopics[currentIndex - 1] : null;
+  const nextTopic =
+    currentIndex < allTopics.length - 1 ? allTopics[currentIndex + 1] : null;
 
-  const isLoading = chapterLoading || topicsLoading;
-
-  // Parse content into sections with illustrations
-  const parseContentWithIllustrations = (content: string, illustrationKey: string | null) => {
-    const illustrations = getTopicIllustrations(illustrationKey);
-    
-    // Clean content - remove code blocks and tables
-    const cleanedContent = content
-      .replace(/```[\s\S]*?```/g, '')
-      .replace(/^\|.*\|$/gm, '')
-      .replace(/^\s*[-:|\s]+$/gm, '')
-      .replace(/\n{3,}/g, '\n\n')
-      .trim();
-
-    // Split content by h2 headers
-    const sections = cleanedContent.split(/(?=##\s)/);
-    
-    return { sections, illustrations };
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen relative">
-        <Header />
-        <div className="flex items-center justify-center py-24">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <span className="ml-4 font-mono text-muted-foreground">Loading...</span>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!currentTopic) {
+  if (!layer || !chapter || !currentTopic) {
     return (
       <div className="min-h-screen relative">
         <Header />
         <ContentSection className="container mx-auto px-8 md:px-16">
           <div className="max-w-4xl mx-auto text-center py-24">
-            <h1 className="font-display text-3xl text-primary mb-4">Topic Not Found</h1>
+            <h1 className="font-display text-3xl text-primary mb-4">
+              Topic Not Found
+            </h1>
             <p className="font-body text-muted-foreground mb-8">
               The topic you're looking for doesn't exist.
             </p>
             <Link
-              to="/chapters"
+              to="/"
               className="inline-flex items-center gap-2 px-6 py-2 border border-primary text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-all duration-300"
             >
-              View All Chapters
+              Return Home
             </Link>
           </div>
         </ContentSection>
@@ -125,9 +148,10 @@ const TopicPage = () => {
     );
   }
 
+  // Parse content into sections
   const { sections, illustrations } = parseContentWithIllustrations(
     currentTopic.content,
-    currentTopic.illustration_key
+    currentTopic.illustrationKey
   );
 
   return (
@@ -138,44 +162,91 @@ const TopicPage = () => {
       {/* Breadcrumb & Navigation */}
       <ContentSection className="container mx-auto px-8 md:px-16">
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-            <Link to="/chapters" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors font-mono text-sm">
-              <List className="w-4 h-4" />
-              All Chapters
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 mb-8 font-mono text-xs text-muted-foreground flex-wrap">
+            <Link to="/" className="hover:text-primary transition-colors">
+              Home
             </Link>
-            
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
-                Chapter {chapter?.chapter_number?.toString().padStart(2, '0')} / {chapter?.title}
-              </span>
-            </div>
+            <span>/</span>
+            <Link
+              to={`/layer/${layer.slug}`}
+              className="hover:text-primary transition-colors"
+            >
+              Layer {layer.number}
+            </Link>
+            <span>/</span>
+            <Link
+              to={`/layer/${layer.slug}/${chapter.slug}`}
+              className="hover:text-primary transition-colors"
+            >
+              {chapter.number} {chapter.title}
+            </Link>
+            <span>/</span>
+            <span className="text-primary">{currentTopic.sectionNumber}</span>
           </div>
 
           {/* Section Header */}
-          <div className="text-center mb-8">
-            <span className="font-mono text-sm text-primary/70 block mb-2">
-              Section {currentTopic.section_number}
-            </span>
-            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-primary tracking-wide">
-              {currentTopic.title.toUpperCase()}
-            </h1>
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-16 h-16 flex items-center justify-center border-2 border-primary bg-primary/10 text-primary">
+                <span className="font-mono text-sm font-medium">
+                  {currentTopic.sectionNumber}
+                </span>
+              </div>
+              <div>
+                <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                  {chapter.title}
+                </p>
+                <h1 className="font-display text-2xl md:text-3xl lg:text-4xl text-primary tracking-wide uppercase">
+                  {currentTopic.title}
+                </h1>
+              </div>
+            </div>
+            <p className="font-mono text-sm text-primary/70 italic max-w-2xl">
+              "{currentTopic.summary}"
+            </p>
           </div>
+
+          {/* On This Topic navigation */}
+          {sections.length > 1 && (
+            <div className="border border-border/50 bg-card/30 backdrop-blur-sm p-5 mb-8">
+              <h2 className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-3">
+                On This Topic
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {sections.map((s, index) => (
+                  <a
+                    key={s.id}
+                    href={`#${s.id}`}
+                    className="px-3 py-2 text-xs font-mono border border-border/60 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
+                  >
+                    {(index + 1).toString().padStart(2, "0")} · {s.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </ContentSection>
 
       {/* Main Content with Inline Illustrations */}
       <ContentSection className="container mx-auto px-8 md:px-16">
         <div className="max-w-5xl mx-auto">
-          
           {/* Hero Section with Main Illustration */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
             <div className="space-y-4">
+              <h2
+                id={sections[0]?.id}
+                className="scroll-mt-24 font-display text-lg text-primary uppercase tracking-wide"
+              >
+                {sections[0]?.title ?? "Overview"}
+              </h2>
               <ReactMarkdown components={markdownComponents}>
-                {sections[0] || ''}
+                {sections[0]?.body ?? ""}
               </ReactMarkdown>
             </div>
             <div className="flex items-start">
-              <div className="w-full bg-card/30 border border-border/30 rounded-lg p-4">
+              <div className="w-full bg-card/30 border border-border/30 p-4">
                 <InteractiveSVGWrapper>
                   {illustrations.main}
                 </InteractiveSVGWrapper>
@@ -185,25 +256,38 @@ const TopicPage = () => {
 
           {/* Content Sections with Alternating Illustrations */}
           {sections.slice(1).map((section, index) => {
-            const inlineIllustration = illustrations.inline[index % illustrations.inline.length];
+            const inlineIllustration =
+              illustrations.inline.length > 0
+                ? illustrations.inline[index % illustrations.inline.length]
+                : null;
             const isReversed = index % 2 === 1;
 
             return (
-              <div 
-                key={index} 
-                className={`grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 mb-10 ${isReversed ? 'lg:flex-row-reverse' : ''}`}
+              <div
+                key={section.id}
+                className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 mb-10"
               >
                 {/* Text Content - Takes 2 columns */}
-                <div className={`lg:col-span-2 ${isReversed ? 'lg:order-2' : 'lg:order-1'}`}>
+                <div
+                  className={`lg:col-span-2 ${isReversed ? "lg:order-2" : "lg:order-1"}`}
+                >
+                  <h2
+                    id={section.id}
+                    className="scroll-mt-24 text-xl font-display text-primary mt-8 mb-4 tracking-wide uppercase"
+                  >
+                    {section.title}
+                  </h2>
                   <ReactMarkdown components={markdownComponents}>
-                    {section}
+                    {section.body}
                   </ReactMarkdown>
                 </div>
-                
+
                 {/* Illustration - Takes 1 column */}
                 {inlineIllustration && (
-                  <div className={`lg:col-span-1 ${isReversed ? 'lg:order-1' : 'lg:order-2'}`}>
-                    <div className="sticky top-24 bg-card/30 border border-border/30 rounded-lg p-4">
+                  <div
+                    className={`lg:col-span-1 ${isReversed ? "lg:order-1" : "lg:order-2"}`}
+                  >
+                    <div className="sticky top-24 bg-card/30 border border-border/30 p-4">
                       <InteractiveSVGWrapper>
                         {inlineIllustration.component}
                       </InteractiveSVGWrapper>
@@ -221,25 +305,25 @@ const TopicPage = () => {
 
       <SectionDivider />
 
-      {/* Topic Navigation Sidebar */}
+      {/* Topics in Chapter */}
       <ContentSection className="container mx-auto px-8 md:px-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="border border-border/50 rounded-lg bg-card/30 p-6">
-            <h3 className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="border border-border/50 bg-card/30 p-6">
+            <h3 className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-4">
               In This Chapter
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {allTopics?.map((topic) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {allTopics.map((topic) => (
                 <Link
-                  key={topic.id}
-                  to={`/read/${chapterSlug}/${topic.slug}`}
-                  className={`px-3 py-2 text-sm font-mono rounded transition-colors ${
-                    topic.slug === topicSlug
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-primary hover:bg-card/50'
+                  key={topic.slug}
+                  to={`/layer/${layer.slug}/${chapter.slug}/${topic.slug}`}
+                  className={`px-3 py-2 text-xs font-mono border transition-colors ${
+                    topic.slug === currentTopic.slug
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border/50 text-muted-foreground hover:border-primary/50 hover:text-primary"
                   }`}
                 >
-                  {topic.section_number}
+                  {topic.sectionNumber} · {topic.title}
                 </Link>
               ))}
             </div>
@@ -251,113 +335,137 @@ const TopicPage = () => {
 
       {/* Prev/Next Navigation */}
       <ContentSection className="container mx-auto px-8 md:px-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-stretch gap-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between">
             {prevTopic ? (
               <Link
-                to={`/read/${chapterSlug}/${prevTopic.slug}`}
-                className="flex-1 group border border-border/50 rounded-lg p-6 hover:border-primary/50 transition-colors"
+                to={`/layer/${layer.slug}/${chapter.slug}/${prevTopic.slug}`}
+                className="group flex items-center gap-3 hover:text-primary transition-colors"
               >
-                <div className="flex items-center gap-2 text-muted-foreground group-hover:text-primary transition-colors mb-2">
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="font-mono text-xs uppercase tracking-wider">Previous</span>
+                <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                <div>
+                  <p className="font-mono text-[10px] text-muted-foreground uppercase">
+                    Previous
+                  </p>
+                  <p className="font-display text-sm text-primary">
+                    {prevTopic.sectionNumber} {prevTopic.title}
+                  </p>
                 </div>
-                <p className="text-lg text-foreground group-hover:text-primary transition-colors">
-                  {prevTopic.title}
-                </p>
               </Link>
             ) : (
-              <div className="flex-1" />
+              <Link
+                to={`/layer/${layer.slug}/${chapter.slug}`}
+                className="group flex items-center gap-3 hover:text-primary transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                <div>
+                  <p className="font-mono text-[10px] text-muted-foreground uppercase">
+                    Back to
+                  </p>
+                  <p className="font-display text-sm text-primary">
+                    {chapter.title}
+                  </p>
+                </div>
+              </Link>
             )}
-            
+
+            <Link
+              to={`/layer/${layer.slug}/${chapter.slug}`}
+              className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              <List className="w-4 h-4" />
+            </Link>
+
             {nextTopic ? (
               <Link
-                to={`/read/${chapterSlug}/${nextTopic.slug}`}
-                className="flex-1 group border border-border/50 rounded-lg p-6 hover:border-primary/50 transition-colors text-right"
+                to={`/layer/${layer.slug}/${chapter.slug}/${nextTopic.slug}`}
+                className="group flex items-center gap-3 text-right hover:text-primary transition-colors"
               >
-                <div className="flex items-center justify-end gap-2 text-muted-foreground group-hover:text-primary transition-colors mb-2">
-                  <span className="font-mono text-xs uppercase tracking-wider">Next</span>
-                  <ArrowRight className="w-4 h-4" />
+                <div>
+                  <p className="font-mono text-[10px] text-muted-foreground uppercase">
+                    Next
+                  </p>
+                  <p className="font-display text-sm text-primary">
+                    {nextTopic.sectionNumber} {nextTopic.title}
+                  </p>
                 </div>
-                <p className="text-lg text-foreground group-hover:text-primary transition-colors">
-                  {nextTopic.title}
-                </p>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </Link>
             ) : (
               <Link
-                to="/chapters"
-                className="flex-1 group border border-primary rounded-lg p-6 hover:bg-primary transition-colors text-right"
+                to={`/layer/${layer.slug}/${chapter.slug}`}
+                className="group flex items-center gap-3 text-right hover:text-primary transition-colors"
               >
-                <div className="flex items-center justify-end gap-2 text-primary group-hover:text-primary-foreground transition-colors mb-2">
-                  <span className="font-mono text-xs uppercase tracking-wider">Completed</span>
-                  <ArrowRight className="w-4 h-4" />
+                <div>
+                  <p className="font-mono text-[10px] text-muted-foreground uppercase">
+                    Completed
+                  </p>
+                  <p className="font-display text-sm text-primary">
+                    {chapter.title}
+                  </p>
                 </div>
-                <p className="text-lg text-primary group-hover:text-primary-foreground transition-colors">
-                  View All Chapters
-                </p>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </Link>
             )}
           </div>
         </div>
       </ContentSection>
 
-      <SectionDivider />
       <Footer />
     </div>
   );
 };
 
-// Consistent markdown components with readable typography
-const markdownComponents = {
-  h2: ({ children }: { children?: React.ReactNode }) => (
-    <h2 className="text-xl font-semibold text-primary mt-8 mb-4 tracking-wide">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="text-lg font-semibold text-primary mt-6 mb-3">
-      {children}
-    </h3>
-  ),
-  h4: ({ children }: { children?: React.ReactNode }) => (
-    <h4 className="text-base font-semibold text-foreground mt-4 mb-2">
-      {children}
-    </h4>
-  ),
-  p: ({ children }: { children?: React.ReactNode }) => (
-    <p className="text-base text-foreground/90 leading-relaxed mb-4">
-      {children}
-    </p>
-  ),
-  strong: ({ children }: { children?: React.ReactNode }) => (
-    <strong className="text-primary font-semibold">{children}</strong>
-  ),
-  em: ({ children }: { children?: React.ReactNode }) => (
-    <em className="text-foreground/80 italic">{children}</em>
-  ),
-  ul: ({ children }: { children?: React.ReactNode }) => (
-    <ul className="text-base text-foreground/90 leading-relaxed mb-4 ml-5 list-disc marker:text-primary/60">
-      {children}
-    </ul>
-  ),
-  ol: ({ children }: { children?: React.ReactNode }) => (
-    <ol className="text-base text-foreground/90 leading-relaxed mb-4 ml-5 list-decimal marker:text-primary/60">
-      {children}
-    </ol>
-  ),
-  li: ({ children }: { children?: React.ReactNode }) => (
-    <li className="mb-1.5">{children}</li>
-  ),
-  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
-    <a href={href} className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
-      {children}
-    </a>
-  ),
-  code: ({ children }: { children?: React.ReactNode }) => (
-    <code className="font-mono text-sm bg-muted/50 text-primary px-1.5 py-0.5 rounded">
-      {children}
-    </code>
-  ),
-};
+// Helper function to get topics for a chapter
+function getTopicsForChapter(chapterSlug: string): TopicContent[] {
+  // For now, only digital-logic has content
+  if (chapterSlug === "digital-logic") {
+    return DIGITAL_LOGIC_TOPICS;
+  }
+  return [];
+}
+
+// Parse content into sections with illustrations
+function parseContentWithIllustrations(
+  content: string,
+  illustrationKey: string
+) {
+  const illustrations = getDigitalLogicIllustrations(illustrationKey);
+
+  const normalized = content
+    .replace(/^#\s+.*\n+/, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  const rawSections = normalized
+    .split(/(?=^##\s)/gm)
+    .filter((s) => s.trim().length > 0);
+  const sections: ParsedSection[] = [];
+  const usedIds = new Map<string, number>();
+
+  const makeId = (title: string) => {
+    const base = slugify(title) || "section";
+    const seen = usedIds.get(base) ?? 0;
+    usedIds.set(base, seen + 1);
+    return seen === 0 ? base : `${base}-${seen + 1}`;
+  };
+
+  if (rawSections.length === 0) {
+    sections.push({ id: "overview", title: "Overview", body: normalized });
+    return { sections, illustrations };
+  }
+
+  for (const raw of rawSections) {
+    if (raw.startsWith("## ")) {
+      const [headingLine, ...rest] = raw.split("\n");
+      const title = headingLine.replace(/^##\s+/, "").trim() || "Section";
+      sections.push({ id: makeId(title), title, body: rest.join("\n").trim() });
+    } else {
+      sections.push({ id: "overview", title: "Overview", body: raw.trim() });
+    }
+  }
+
+  return { sections, illustrations };
+}
 
 export default TopicPage;

@@ -1,19 +1,18 @@
 import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
-const chapters = [
-  { id: 'intro', label: 'Introduction', number: '01' },
-  { id: 'data-structures', label: 'Data Structures', number: '02' },
-  { id: 'web', label: 'How the Web Works', number: '03' },
-  { id: 'databases', label: 'Databases & Storage', number: '04' },
-  { id: 'algorithms', label: 'Algorithms', number: '05' },
-  { id: 'cryptography', label: 'Cryptography', number: '06' },
-  { id: 'memory', label: 'Memory Management', number: '07' },
+type TocItem = { id: string; label: string; number?: string };
+
+const defaultItems: TocItem[] = [
+  { id: 'intro', label: 'Overview', number: '01' },
+  { id: 'method', label: 'Method', number: '02' },
+  { id: 'paths', label: 'Reading Paths', number: '03' },
+  { id: 'chapters', label: 'Chapters', number: '04' },
 ];
 
-const TableOfContents = () => {
+const TableOfContents = ({ items = defaultItems }: { items?: TocItem[] }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [activeSection, setActiveSection] = useState('intro');
+  const [activeSection, setActiveSection] = useState(items[0]?.id ?? 'intro');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -30,13 +29,13 @@ const TableOfContents = () => {
       }
     );
 
-    chapters.forEach((chapter) => {
-      const element = document.getElementById(chapter.id);
+    items.forEach((item) => {
+      const element = document.getElementById(item.id);
       if (element) observer.observe(element);
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [items]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -62,7 +61,7 @@ const TableOfContents = () => {
           aria-label="Toggle table of contents"
         >
           <span className="font-mono text-xs text-primary uppercase tracking-wider whitespace-nowrap overflow-hidden">
-            {isExpanded ? 'Chapters' : ''}
+            {isExpanded ? 'On This Page' : ''}
           </span>
           {isExpanded ? (
             <ChevronUp className="w-4 h-4 text-primary shrink-0" />
@@ -74,15 +73,15 @@ const TableOfContents = () => {
         {/* Chapter list */}
         <div className={`transition-all duration-300 ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <ul className="py-2 px-2 space-y-1">
-            {chapters.map((chapter) => (
-              <li key={chapter.id}>
+            {items.map((item) => (
+              <li key={item.id}>
                 <button
-                  onClick={() => scrollToSection(chapter.id)}
+                  onClick={() => scrollToSection(item.id)}
                   className={`
                     w-full text-left px-3 py-2 rounded-md
                     font-mono text-xs transition-all duration-200
                     flex items-center gap-3 group
-                    ${activeSection === chapter.id 
+                    ${activeSection === item.id 
                       ? 'bg-primary/10 text-primary' 
                       : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
                     }
@@ -90,14 +89,14 @@ const TableOfContents = () => {
                 >
                   <span className={`
                     w-5 h-5 flex items-center justify-center rounded-sm border text-[10px]
-                    ${activeSection === chapter.id 
+                    ${activeSection === item.id 
                       ? 'border-primary bg-primary text-primary-foreground' 
                       : 'border-muted-foreground/30 group-hover:border-primary/50'
                     }
                   `}>
-                    {chapter.number}
+                    {item.number ?? '•'}
                   </span>
-                  <span className="truncate">{chapter.label}</span>
+                  <span className="truncate">{item.label}</span>
                 </button>
               </li>
             ))}
@@ -107,18 +106,18 @@ const TableOfContents = () => {
         {/* Mini indicators when collapsed */}
         {!isExpanded && (
           <div className="py-2 px-3 space-y-1.5">
-            {chapters.map((chapter) => (
+            {items.map((item) => (
               <button
-                key={chapter.id}
-                onClick={() => scrollToSection(chapter.id)}
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
                 className={`
                   w-full h-1.5 rounded-full transition-all duration-200
-                  ${activeSection === chapter.id 
+                  ${activeSection === item.id 
                     ? 'bg-primary' 
                     : 'bg-primary/20 hover:bg-primary/40'
                   }
                 `}
-                aria-label={`Go to ${chapter.label}`}
+                aria-label={`Go to ${item.label}`}
               />
             ))}
           </div>

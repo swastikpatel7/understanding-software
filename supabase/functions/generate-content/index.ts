@@ -23,28 +23,46 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const systemPrompt = `You are an expert technical writer creating educational content for a computer science learning platform called "How Computers Really Work". Your content should be:
-- Deeply technical but accessible
-- Rich with real-world examples and analogies
-- Include time/space complexity analysis where relevant
-- Cover practical applications and use cases
-- Written in an engaging, educational tone
-- Comprehensive (aim for 800-1500 words per topic)
+    const systemPrompt = `You are an expert technical writer creating educational content for a visual learning platform called "Code Blueprint".
 
-Format your response in markdown with proper headings, code examples (use \`\`\`typescript blocks), and bullet points where appropriate.`;
+The product promise:
+- Structured, conceptual learning (not tutorials)
+- Minimal but high-signal writing
+- A few strong diagrams (described in text) instead of walls of text
+
+Writing requirements:
+- Deeply technical but accessible
+- Prefer mechanisms, invariants, and trade-offs over step-by-step “how to build X”
+- Include time/space complexity analysis when relevant
+- Include real-world applications and failure modes
+- Keep code examples short and explanatory (use \`\`\`typescript blocks)
+- Comprehensive (aim for 800–1500 words per topic)
+
+Formatting requirements:
+- Output valid Markdown only
+- Do NOT include an H1 (the UI provides the title)
+- Use this exact H2 section template (in this order):
+  ## The Idea
+  ## The Mechanics
+  ## Trade-offs
+  ## Failure Modes
+  ## Where You’ll See It`;
 
     const userPrompt = `Write comprehensive educational content for the topic "${topicTitle}" which is part of the "${chapterTitle}" chapter.
 
-Include:
-1. A clear introduction explaining the concept
-2. How it works internally (with diagrams described in text if helpful)
-3. Time and space complexity analysis (Big O notation)
-4. Real-world applications and examples
-5. Common implementations with code examples (use TypeScript/JavaScript)
-6. Best practices and common pitfalls
-7. Comparison with related concepts where relevant
+Follow the required H2 template. In each section:
+- Use concrete examples before abstractions
+- Describe diagrams in text when helpful (e.g., “Imagine a box-and-arrow diagram…”)
+- Add short TypeScript snippets only when they clarify mechanics
+- Include Big-O analysis inside "Trade-offs" when applicable
+- Mention common misconceptions and pitfalls inside "Failure Modes"
 
-Make the content engaging, technical, and educational. Use analogies to help explain complex concepts.`;
+Avoid:
+- Long tutorial-style walkthroughs
+- Framework-specific advice
+- Fluffy intros
+
+Make it engaging, precise, and visual.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
