@@ -27,7 +27,11 @@ const slugify = (value: string) =>
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
 
-// Markdown components with custom styling
+// By defining markdownComponents outside the TopicPage component, we ensure
+// that the object and all its nested functions are created only once, rather
+// than on every single render of the page. This is a performance optimization
+// that avoids unnecessary object allocations and function definitions,
+// reducing the cost of re-renders.
 const markdownComponents = {
   h1: ({ children }: { children?: React.ReactNode }) => (
     <h1 className="text-2xl font-display text-primary mt-8 mb-4 tracking-wide uppercase">
