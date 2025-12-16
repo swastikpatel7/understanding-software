@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import SectionDivider from "@/components/SectionDivider";
@@ -103,8 +104,28 @@ const CHAPTER_TOPICS: Record<string, TopicSection[]> = {
 
 const ChapterPage = () => {
   const { layerSlug, chapterSlug } = useParams<{ layerSlug: string; chapterSlug: string }>();
-  const layer = getLayerBySlug(layerSlug || "");
-  const chapter = layer?.chapters.find((c) => c.slug === chapterSlug);
+
+  // Memoize layer and chapter data to avoid re-calculating on every render.
+  // This is a performance optimization that prevents expensive array searches
+  // when component state changes unnecessarily.
+  const { layer, chapter, prevChapter, nextChapter } = useMemo(() => {
+    const currentLayer = getLayerBySlug(layerSlug || "");
+    if (!currentLayer) {
+      return { layer: undefined, chapter: undefined, prevChapter: undefined, nextChapter: undefined };
+    }
+
+    const currentChapter = currentLayer.chapters.find((c) => c.slug === chapterSlug);
+    if (!currentChapter) {
+      return { layer: currentLayer, chapter: undefined, prevChapter: undefined, nextChapter: undefined };
+    }
+
+    const chapterIndex = currentLayer.chapters.findIndex((c) => c.slug === chapterSlug);
+    const prev = currentLayer.chapters[chapterIndex - 1];
+    const next = currentLayer.chapters[chapterIndex + 1];
+
+    return { layer: currentLayer, chapter: currentChapter, prevChapter: prev, nextChapter: next };
+  }, [layerSlug, chapterSlug]);
+
   const topics = CHAPTER_TOPICS[chapterSlug || ""] || [];
 
   if (!layer || !chapter) {
@@ -119,10 +140,6 @@ const ChapterPage = () => {
       </div>
     );
   }
-
-  const chapterIndex = layer.chapters.findIndex((c) => c.slug === chapterSlug);
-  const prevChapter = layer.chapters[chapterIndex - 1];
-  const nextChapter = layer.chapters[chapterIndex + 1];
 
   return (
     <div className="min-h-screen relative">
