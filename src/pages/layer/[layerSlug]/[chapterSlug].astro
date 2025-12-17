@@ -1,0 +1,288 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import SectionDivider from '../../../components/astro/SectionDivider.astro';
+import Footer from '../../../components/astro/Footer.astro';
+import { LAYERS, getLayerBySlug, type Layer, type LayerChapter } from '../../../content/layers';
+import { DIGITAL_LOGIC_TOPICS } from '../../../content/topics/digital-logic';
+
+// Topic data structure
+type TopicSection = {
+  number: string;
+  slug: string;
+  title: string;
+  summary: string;
+};
+
+// Helper to convert TopicContent to TopicSection
+const toTopicSection = (t: { sectionNumber: string; slug: string; title: string; summary: string }): TopicSection => ({
+  number: t.sectionNumber,
+  slug: t.slug,
+  title: t.title,
+  summary: t.summary,
+});
+
+// Chapter topics mapping
+const CHAPTER_TOPICS: Record<string, TopicSection[]> = {
+  "digital-logic": DIGITAL_LOGIC_TOPICS.map(toTopicSection),
+  "the-processor": [
+    { number: "0.2.1", slug: "0-2-1", title: "Instruction Set Architecture", summary: "The contract between hardware and software." },
+    { number: "0.2.2", slug: "0-2-2", title: "Registers", summary: "The fastest memory — why they matter." },
+    { number: "0.2.3", slug: "0-2-3", title: "Fetch-Decode-Execute", summary: "The fundamental cycle." },
+    { number: "0.2.4", slug: "0-2-4", title: "The ALU", summary: "Arithmetic and logic — where computation happens." },
+    { number: "0.2.5", slug: "0-2-5", title: "Pipelining", summary: "Overlapping work — throughput vs latency." },
+    { number: "0.2.6", slug: "0-2-6", title: "Hazards & Stalls", summary: "When the pipeline breaks — data, control, structural." },
+    { number: "0.2.7", slug: "0-2-7", title: "Branch Prediction", summary: "Guessing the future — why CPUs speculate." },
+    { number: "0.2.8", slug: "0-2-8", title: "Superscalar & OoO", summary: "Multiple instructions, out of order — modern cores." },
+  ],
+  "memory-hierarchy": [
+    { number: "0.3.1", slug: "0-3-1", title: "The Memory Wall", summary: "Why memory can't keep up with CPUs." },
+    { number: "0.3.2", slug: "0-3-2", title: "Registers", summary: "Nanoseconds — built into the CPU." },
+    { number: "0.3.3", slug: "0-3-3", title: "Cache Architecture", summary: "L1/L2/L3 — locality saves the day." },
+    { number: "0.3.4", slug: "0-3-4", title: "Cache Lines & Associativity", summary: "How caches organize data." },
+    { number: "0.3.5", slug: "0-3-5", title: "Cache Coherence", summary: "Multi-core problem — MESI protocol." },
+    { number: "0.3.6", slug: "0-3-6", title: "Main Memory (RAM)", summary: "DRAM — capacitors that forget." },
+    { number: "0.3.7", slug: "0-3-7", title: "Memory Controllers", summary: "Scheduling access — row buffers and banks." },
+  ],
+  "io-and-buses": [
+    { number: "0.4.1", slug: "0-4-1", title: "Bus Architecture", summary: "Shared highways for data." },
+    { number: "0.4.2", slug: "0-4-2", title: "Programmed I/O", summary: "CPU does all the work — polling." },
+    { number: "0.4.3", slug: "0-4-3", title: "Interrupts", summary: "Hardware signals — event-driven execution." },
+    { number: "0.4.4", slug: "0-4-4", title: "DMA", summary: "Bypassing the CPU — memory-to-memory." },
+    { number: "0.4.5", slug: "0-4-5", title: "PCIe", summary: "Modern high-speed interconnect — lanes and packets." },
+    { number: "0.4.6", slug: "0-4-6", title: "Device Controllers", summary: "Translating protocols — disk, network, GPU." },
+  ],
+  "processes-and-threads": [
+    { number: "1.1.1", slug: "1-1-1", title: "What is a Process?", summary: "Isolated execution environment — address space, resources." },
+    { number: "1.1.2", slug: "1-1-2", title: "Process States", summary: "New → Ready → Running → Waiting → Terminated." },
+    { number: "1.1.3", slug: "1-1-3", title: "Context Switching", summary: "Saving and restoring state — the cost of multitasking." },
+    { number: "1.1.4", slug: "1-1-4", title: "Threads", summary: "Lightweight processes — shared memory, separate stacks." },
+    { number: "1.1.5", slug: "1-1-5", title: "Scheduling Algorithms", summary: "FCFS, Round Robin, Priority, CFS — trade-offs." },
+    { number: "1.1.6", slug: "1-1-6", title: "Multi-core Scheduling", summary: "Affinity, load balancing, NUMA awareness." },
+  ],
+  "memory-management": [
+    { number: "1.2.1", slug: "1-2-1", title: "Address Spaces", summary: "Illusion of private memory — virtual addresses." },
+    { number: "1.2.2", slug: "1-2-2", title: "Paging", summary: "Fixed-size chunks — page tables." },
+    { number: "1.2.3", slug: "1-2-3", title: "The TLB", summary: "Caching translations — why it's critical." },
+    { number: "1.2.4", slug: "1-2-4", title: "Page Faults", summary: "When memory isn't there — demand paging." },
+    { number: "1.2.5", slug: "1-2-5", title: "Page Replacement", summary: "FIFO, LRU, Clock — what to evict." },
+    { number: "1.2.6", slug: "1-2-6", title: "Memory-Mapped Files", summary: "Files as memory — mmap." },
+    { number: "1.2.7", slug: "1-2-7", title: "Shared Memory", summary: "IPC through memory — zero-copy communication." },
+  ],
+  "concurrency": [
+    { number: "1.3.1", slug: "1-3-1", title: "Race Conditions", summary: "Non-deterministic bugs — the enemy." },
+    { number: "1.3.2", slug: "1-3-2", title: "Critical Sections", summary: "Code that can't be interrupted." },
+    { number: "1.3.3", slug: "1-3-3", title: "Mutexes & Locks", summary: "Mutual exclusion — one at a time." },
+    { number: "1.3.4", slug: "1-3-4", title: "Semaphores", summary: "Counting resources — producer/consumer." },
+    { number: "1.3.5", slug: "1-3-5", title: "Deadlock", summary: "Circular waiting — the four conditions." },
+    { number: "1.3.6", slug: "1-3-6", title: "Deadlock Prevention", summary: "Breaking the cycle — resource ordering." },
+    { number: "1.3.7", slug: "1-3-7", title: "Lock-Free Structures", summary: "CAS and atomic operations — no locks needed." },
+    { number: "1.3.8", slug: "1-3-8", title: "Memory Barriers", summary: "Ordering guarantees — why compilers lie." },
+  ],
+  "file-systems": [
+    { number: "1.4.1", slug: "1-4-1", title: "Block Storage", summary: "Disks speak in blocks — not bytes." },
+    { number: "1.4.2", slug: "1-4-2", title: "File Abstraction", summary: "Named sequences of bytes." },
+    { number: "1.4.3", slug: "1-4-3", title: "Directories", summary: "Hierarchical namespace — paths." },
+    { number: "1.4.4", slug: "1-4-4", title: "Inodes", summary: "Metadata separated from data." },
+    { number: "1.4.5", slug: "1-4-5", title: "Free Space Management", summary: "Bitmaps, free lists — allocation." },
+    { number: "1.4.6", slug: "1-4-6", title: "Journaling", summary: "Crash recovery — write-ahead logging." },
+    { number: "1.4.7", slug: "1-4-7", title: "Copy-on-Write", summary: "ZFS, Btrfs — never overwrite." },
+  ],
+  "the-kernel": [
+    { number: "1.5.1", slug: "1-5-1", title: "User vs Kernel Mode", summary: "Privilege rings — protection." },
+    { number: "1.5.2", slug: "1-5-2", title: "System Calls", summary: "Crossing the boundary — trap instructions." },
+    { number: "1.5.3", slug: "1-5-3", title: "Monolithic Kernels", summary: "Everything in kernel space — Linux." },
+    { number: "1.5.4", slug: "1-5-4", title: "Microkernels", summary: "Minimal kernel — services in userspace." },
+    { number: "1.5.5", slug: "1-5-5", title: "Kernel Modules", summary: "Dynamic loading — extensibility." },
+    { number: "1.5.6", slug: "1-5-6", title: "Virtualization", summary: "VMs and containers — nested privilege." },
+  ],
+};
+
+export function getStaticPaths() {
+  const paths: { params: { layerSlug: string; chapterSlug: string }; props: { layer: Layer; chapter: LayerChapter } }[] = [];
+
+  for (const layer of LAYERS) {
+    for (const chapter of layer.chapters) {
+      paths.push({
+        params: { layerSlug: layer.slug, chapterSlug: chapter.slug },
+        props: { layer, chapter },
+      });
+    }
+  }
+
+  return paths;
+}
+
+interface Props {
+  layer: Layer;
+  chapter: LayerChapter;
+}
+
+const { layer, chapter } = Astro.props;
+
+const chapterIndex = layer.chapters.findIndex((c) => c.slug === chapter.slug);
+const prevChapter = layer.chapters[chapterIndex - 1];
+const nextChapter = layer.chapters[chapterIndex + 1];
+const topics = CHAPTER_TOPICS[chapter.slug] || [];
+---
+
+<PageLayout title={`${chapter.number} ${chapter.title} - Code Blueprint`}>
+  <SectionDivider />
+
+  <!-- Chapter Header -->
+  <section class="relative z-10 py-12 md:py-20 container mx-auto px-8 md:px-16">
+    <div class="max-w-5xl mx-auto">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 mb-8 font-mono text-xs text-muted-foreground">
+        <a href="/" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <a href={`/layer/${layer.slug}`} class="hover:text-primary transition-colors">
+          Layer {layer.number}: {layer.title}
+        </a>
+        <span>/</span>
+        <span class="text-primary">{chapter.number}</span>
+      </div>
+
+      <!-- Chapter title section -->
+      <div class="flex items-start gap-6 mb-8">
+        <div class="w-20 h-20 flex items-center justify-center border-2 border-primary bg-primary/10 text-primary">
+          <span class="font-mono text-xl font-medium">{chapter.number}</span>
+        </div>
+
+        <div class="flex-1">
+          <p class="font-mono text-xs text-muted-foreground uppercase tracking-wider mb-1">
+            Layer {layer.number}: {layer.title}
+          </p>
+          <h1 class="font-display text-3xl md:text-4xl text-primary uppercase tracking-wide mb-4">
+            {chapter.title}
+          </h1>
+          <p class="font-body text-lg text-muted-foreground leading-relaxed max-w-2xl">
+            Deep dive into {chapter.title.toLowerCase()}. Understanding the mechanisms,
+            trade-offs, and failure modes that shape how software interacts with {
+              layer.number === 0 ? "hardware" : "the operating system"
+            }.
+          </p>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="flex items-center gap-6 py-4 border-y border-border/50">
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs text-muted-foreground uppercase">Topics</span>
+          <span class="font-mono text-lg text-primary">{topics.length}</span>
+        </div>
+        <div class="w-px h-6 bg-border/50"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs text-muted-foreground uppercase">Est. Time</span>
+          <span class="font-mono text-sm text-muted-foreground">{topics.length * 8} min</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <SectionDivider />
+
+  <!-- Topics List -->
+  <section class="relative z-10 py-12 md:py-20 container mx-auto px-8 md:px-16">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex items-center gap-3 mb-8">
+        <span class="font-mono text-xs text-muted-foreground uppercase tracking-widest">Topics</span>
+        <div class="h-px flex-1 bg-border"></div>
+      </div>
+
+      <div class="space-y-3">
+        {topics.map((topic) => (
+          <a
+            href={`/layer/${layer.slug}/${chapter.slug}/${topic.number.replace(/\./g, "-")}`}
+            class="group block relative border border-border/50 hover:border-primary/50 bg-card/30 hover:bg-card/50 transition-all duration-200"
+          >
+            <div class="absolute -left-px -top-px w-14 h-full border-r border-border/50 group-hover:border-primary/50 bg-muted/20 group-hover:bg-primary/5 flex items-center justify-center transition-all duration-200">
+              <span class="font-mono text-sm text-muted-foreground group-hover:text-primary transition-colors">
+                {topic.number}
+              </span>
+            </div>
+
+            <div class="pr-6 py-4 flex items-center justify-between gap-4" style="padding-left: 4.5rem;">
+              <div class="flex-1">
+                <h3 class="font-display text-lg text-primary group-hover:text-primary transition-colors mb-1">
+                  {topic.title}
+                </h3>
+                <p class="font-body text-sm text-muted-foreground">{topic.summary}</p>
+              </div>
+
+              <svg class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            <div class="absolute bottom-0 left-14 right-0 h-0.5 bg-border/30">
+              <div class="h-full bg-primary w-0 group-hover:w-full transition-all duration-300"></div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {topics.length > 0 && (
+        <div class="mt-8 text-center">
+          <a
+            href={`/layer/${layer.slug}/${chapter.slug}/${topics[0].number.replace(/\./g, "-")}`}
+            class="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+          >
+            Start with {topics[0].title}
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <SectionDivider />
+
+  <!-- Navigation -->
+  <section class="relative z-10 py-12 md:py-20 container mx-auto px-8 md:px-16">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex items-center justify-between">
+        {prevChapter ? (
+          <a href={`/layer/${layer.slug}/${prevChapter.slug}`} class="group flex items-center gap-3 hover:text-primary transition-colors">
+            <svg class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <div>
+              <p class="font-mono text-[10px] text-muted-foreground uppercase">Previous</p>
+              <p class="font-display text-sm text-primary">{prevChapter.number} {prevChapter.title}</p>
+            </div>
+          </a>
+        ) : (
+          <a href={`/layer/${layer.slug}`} class="group flex items-center gap-3 hover:text-primary transition-colors">
+            <svg class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <div>
+              <p class="font-mono text-[10px] text-muted-foreground uppercase">Back to</p>
+              <p class="font-display text-sm text-primary">Layer {layer.number}</p>
+            </div>
+          </a>
+        )}
+
+        <a href={`/layer/${layer.slug}`} class="font-mono text-xs text-muted-foreground hover:text-primary transition-colors">
+          All Chapters
+        </a>
+
+        {nextChapter ? (
+          <a href={`/layer/${layer.slug}/${nextChapter.slug}`} class="group flex items-center gap-3 text-right hover:text-primary transition-colors">
+            <div>
+              <p class="font-mono text-[10px] text-muted-foreground uppercase">Next</p>
+              <p class="font-display text-sm text-primary">{nextChapter.number} {nextChapter.title}</p>
+            </div>
+            <svg class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        ) : <div />}
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</PageLayout>

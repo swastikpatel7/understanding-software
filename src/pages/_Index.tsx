@@ -8,13 +8,23 @@ import LayerCard from "@/components/LayerCard";
 import InteractiveSVGWrapper from "@/components/illustrations/InteractiveSVGWrapper";
 import SoftwareStackBannerSVG from "@/components/illustrations/SoftwareStackBannerSVG";
 import { LAYERS, getAvailableLayers, getComingSoonLayers } from "@/content/layers";
+import ViewportCornerMarks from "@/components/ViewportCornerMarks";
+import CircuitPatternBackground from "@/components/CircuitPatternBackground";
+import FloatingGridOverlay from "@/components/FloatingGridOverlay";
+import { SectionAnnotations } from "@/components/FloatingTechAnnotation";
 
 const Index = () => {
   const availableLayers = getAvailableLayers();
   const comingSoonLayers = getComingSoonLayers();
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative noise-overlay">
+      {/* Global viewport corner marks */}
+      <ViewportCornerMarks />
+
+      {/* Subtle floating grid overlay */}
+      <FloatingGridOverlay />
+
       <Header />
       <TableOfContents
         items={[
@@ -25,10 +35,14 @@ const Index = () => {
         ]}
       />
 
-      <SectionDivider />
+      <SectionDivider variant="technical" />
 
       {/* Hero Section */}
       <ContentSection id="intro" className="container mx-auto px-8 md:px-16 scroll-mt-8">
+        {/* Section-specific background */}
+        <CircuitPatternBackground variant="hero" />
+        <SectionAnnotations sectionId="intro" />
+
         <div className="mb-12">
           <InteractiveSVGWrapper className="w-full">
             <SoftwareStackBannerSVG />
@@ -88,10 +102,14 @@ const Index = () => {
         </div>
       </ContentSection>
 
-      <SectionDivider />
+      <SectionDivider variant="gradient" />
 
       {/* Philosophy Section */}
       <ContentSection id="philosophy" className="container mx-auto px-8 md:px-16 scroll-mt-8">
+        {/* Section-specific background */}
+        <CircuitPatternBackground variant="philosophy" />
+        <SectionAnnotations sectionId="philosophy" />
+
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3 mb-10">
             <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
@@ -157,10 +175,14 @@ const Index = () => {
         </div>
       </ContentSection>
 
-      <SectionDivider />
+      <SectionDivider variant="technical" label="structure" />
 
       {/* Layers Section */}
       <ContentSection id="layers" className="container mx-auto px-8 md:px-16 scroll-mt-8">
+        {/* Section-specific background */}
+        <CircuitPatternBackground variant="stack" />
+        <SectionAnnotations sectionId="layers" />
+
         <div className="max-w-6xl mx-auto">
           <div className="space-y-3 mb-10">
             <div className="flex items-center gap-3">
@@ -236,10 +258,14 @@ const Index = () => {
         </div>
       </ContentSection>
 
-      <SectionDivider />
+      <SectionDivider variant="gradient" />
 
       {/* Roadmap / Progress Section */}
       <ContentSection id="roadmap" className="container mx-auto px-8 md:px-16 scroll-mt-8">
+        {/* Section-specific background */}
+        <CircuitPatternBackground variant="roadmap" />
+        <SectionAnnotations sectionId="roadmap" />
+
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-10">
             <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
@@ -248,23 +274,36 @@ const Index = () => {
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          {/* Visual progress bar */}
-          <div className="mb-10">
-            <div className="flex items-center gap-1 mb-3">
-              {LAYERS.map((layer) => (
+          {/* Visual progress bar - enhanced */}
+          <div className="mb-10 relative">
+            {/* Subtle glow behind active items */}
+            <div className="absolute inset-0 -inset-y-2 pointer-events-none">
+              <div
+                className="h-full"
+                style={{
+                  background: `linear-gradient(90deg, hsl(var(--primary) / 0.05) 0%, hsl(var(--primary) / 0.05) ${(availableLayers.length / LAYERS.length) * 100}%, transparent ${(availableLayers.length / LAYERS.length) * 100}%)`
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-1 mb-3 relative">
+              {LAYERS.map((layer, index) => (
                 <div
                   key={layer.number}
-                  className={`flex-1 h-8 flex items-center justify-center border ${
+                  className={`flex-1 h-8 flex items-center justify-center border transition-all duration-500 ${
                     layer.status === "available"
                       ? "border-primary bg-primary/20 text-primary"
                       : "border-border/30 bg-muted/10 text-muted-foreground/50"
                   }`}
+                  style={{
+                    animationDelay: `${index * 0.1}s`
+                  }}
                 >
                   <span className="font-mono text-xs">{layer.number}</span>
                 </div>
               ))}
             </div>
-            <div className="flex justify-between font-mono text-[10px] text-muted-foreground">
+            <div className="flex justify-between font-mono text-[10px] text-muted-foreground relative">
               <span>Hardware</span>
               <span>{Math.round((availableLayers.length / LAYERS.length) * 100)}% Complete</span>
               <span>Frontier</span>

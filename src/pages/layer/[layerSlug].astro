@@ -1,0 +1,207 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import SectionDivider from '../../components/astro/SectionDivider.astro';
+import Footer from '../../components/astro/Footer.astro';
+import { LAYERS, getLayerBySlug, type Layer } from '../../content/layers';
+
+export function getStaticPaths() {
+  return LAYERS.map((layer) => ({
+    params: { layerSlug: layer.slug },
+    props: { layer },
+  }));
+}
+
+interface Props {
+  layer: Layer;
+}
+
+const { layer } = Astro.props;
+const prevLayer = LAYERS.find((l) => l.number === layer.number - 1);
+const nextLayer = LAYERS.find((l) => l.number === layer.number + 1);
+const totalTopics = layer.chapters.reduce((sum, ch) => sum + ch.topicCount, 0);
+---
+
+<PageLayout title={`Layer ${layer.number}: ${layer.title} - Code Blueprint`}>
+  <SectionDivider />
+
+  <!-- Layer Header -->
+  <section class="relative z-10 py-12 md:py-20 container mx-auto px-8 md:px-16">
+    <div class="max-w-5xl mx-auto">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 mb-8 font-mono text-xs text-muted-foreground">
+        <a href="/" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <span class="text-primary">Layer {layer.number}</span>
+      </div>
+
+      <!-- Layer title section -->
+      <div class="flex items-start gap-6 mb-8">
+        <!-- Layer number badge -->
+        <div class="w-20 h-20 flex items-center justify-center border-2 border-primary bg-primary/10 text-primary">
+          <span class="font-mono text-3xl font-medium">{layer.number}</span>
+        </div>
+
+        <div class="flex-1">
+          <h1 class="font-display text-3xl md:text-4xl text-primary uppercase tracking-wide mb-2">
+            {layer.title}
+          </h1>
+          <p class="font-mono text-sm text-primary/70 italic mb-4">
+            "{layer.tagline}"
+          </p>
+          <p class="font-body text-lg text-muted-foreground leading-relaxed max-w-2xl">
+            {layer.description}
+          </p>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="flex items-center gap-6 py-4 border-y border-border/50">
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs text-muted-foreground uppercase">Chapters</span>
+          <span class="font-mono text-lg text-primary">{layer.chapters.length}</span>
+        </div>
+        <div class="w-px h-6 bg-border/50"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs text-muted-foreground uppercase">Topics</span>
+          <span class="font-mono text-lg text-primary">{totalTopics}</span>
+        </div>
+        <div class="w-px h-6 bg-border/50"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs text-muted-foreground uppercase">Status</span>
+          <span class={`font-mono text-sm ${layer.status === "available" ? "text-primary" : "text-muted-foreground"}`}>
+            {layer.status === "available" ? "Available" : "Coming Soon"}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <SectionDivider />
+
+  <!-- Chapters List -->
+  <section class="relative z-10 py-12 md:py-20 container mx-auto px-8 md:px-16">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex items-center gap-3 mb-8">
+        <span class="font-mono text-xs text-muted-foreground uppercase tracking-widest">
+          Chapters in This Layer
+        </span>
+        <div class="h-px flex-1 bg-border"></div>
+      </div>
+
+      <div class="space-y-6">
+        {layer.chapters.map((chapter, index) => (
+          <div class="group relative border border-border/50 hover:border-primary/50 bg-card/30 hover:bg-card/50 transition-all duration-200">
+            <!-- Chapter number marker -->
+            <div class="absolute -left-px -top-px w-16 h-full border-r border-border/50 group-hover:border-primary/50 bg-muted/20 group-hover:bg-primary/5 flex items-center justify-center transition-all duration-200">
+              <span class="font-mono text-lg text-muted-foreground group-hover:text-primary transition-colors">
+                {chapter.number}
+              </span>
+            </div>
+
+            <div class="pl-20 pr-6 py-6">
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex-1">
+                  <h3 class="font-display text-xl text-primary uppercase tracking-wide mb-2">
+                    {chapter.title}
+                  </h3>
+                  <p class="font-mono text-xs text-muted-foreground mb-4">
+                    {chapter.topicCount} topics
+                  </p>
+                  <p class="font-body text-sm text-muted-foreground leading-relaxed">
+                    Deep dive into {chapter.title.toLowerCase()}. Understanding the mechanisms,
+                    trade-offs, and failure modes.
+                  </p>
+                </div>
+
+                {layer.status === "available" && (
+                  <a
+                    href={`/layer/${layer.slug}/${chapter.slug}`}
+                    class="inline-flex items-center gap-2 px-4 py-2 border border-primary text-primary font-mono text-xs uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-all duration-200 shrink-0"
+                  >
+                    Enter
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                )}
+              </div>
+
+              {index === 0 && layer.status === "available" && (
+                <div class="mt-4 pt-4 border-t border-border/30">
+                  <p class="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mb-2">
+                    Sample Topics
+                  </p>
+                  <div class="flex flex-wrap gap-2">
+                    {["The Idea", "The Mechanics", "Trade-offs", "Failure Modes"].map((topic) => (
+                      <span class="px-2 py-1 bg-muted/30 text-muted-foreground font-mono text-xs">
+                        {topic}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <!-- Progress indicator -->
+            <div class="absolute bottom-0 left-16 right-0 h-0.5 bg-border/30">
+              <div class="h-full bg-primary/30 w-0 group-hover:w-1/4 transition-all duration-500"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <SectionDivider />
+
+  <!-- Navigation to other layers -->
+  <section class="relative z-10 py-12 md:py-20 container mx-auto px-8 md:px-16">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex items-center justify-between">
+        {prevLayer ? (
+          <a href={`/layer/${prevLayer.slug}`} class="group flex items-center gap-3 hover:text-primary transition-colors">
+            <svg class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <div>
+              <p class="font-mono text-[10px] text-muted-foreground uppercase">Previous Layer</p>
+              <p class="font-display text-sm text-primary">
+                {prevLayer.number}. {prevLayer.title}
+              </p>
+            </div>
+          </a>
+        ) : <div />}
+
+        <a href="/" class="font-mono text-xs text-muted-foreground hover:text-primary transition-colors">
+          All Layers
+        </a>
+
+        {nextLayer ? (
+          <a
+            href={nextLayer.status === "available" ? `/layer/${nextLayer.slug}` : "#"}
+            class={`group flex items-center gap-3 text-right ${
+              nextLayer.status === "available"
+                ? "hover:text-primary transition-colors"
+                : "opacity-50 cursor-not-allowed"
+            }`}
+          >
+            <div>
+              <p class="font-mono text-[10px] text-muted-foreground uppercase">Next Layer</p>
+              <p class="font-display text-sm text-primary">
+                {nextLayer.number}. {nextLayer.title}
+              </p>
+              {nextLayer.status === "coming_soon" && (
+                <p class="font-mono text-[10px] text-muted-foreground">Coming Soon</p>
+              )}
+            </div>
+            <svg class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        ) : <div />}
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</PageLayout>

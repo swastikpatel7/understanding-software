@@ -1,0 +1,35 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import SectionDivider from '../components/astro/SectionDivider.astro';
+import Footer from '../components/astro/Footer.astro';
+---
+
+<PageLayout title="Page Not Found - Code Blueprint">
+  <SectionDivider />
+
+  <section class="relative z-10 py-12 md:py-20 container mx-auto px-8 md:px-16">
+    <div class="max-w-3xl mx-auto py-20 text-center space-y-4">
+      <p class="font-mono text-xs text-muted-foreground uppercase tracking-widest">404</p>
+      <h1 class="font-display text-3xl md:text-4xl text-primary">Page Not Found</h1>
+      <p class="font-body text-muted-foreground leading-relaxed">
+        The page you requested doesn't exist (or it moved).
+      </p>
+      <div class="pt-4 flex items-center justify-center gap-4">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 px-6 py-2 border border-primary text-primary font-mono text-sm uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+        >
+          Home
+        </a>
+        <a
+          href="/chapters"
+          class="inline-flex items-center gap-2 px-6 py-2 border border-border text-muted-foreground font-mono text-sm uppercase tracking-wider hover:text-primary hover:border-primary/50 transition-all duration-300"
+        >
+          Chapters
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</PageLayout>

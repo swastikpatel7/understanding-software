@@ -1,0 +1,21 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/react/Header.tsx';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  showHeader?: boolean;
+}
+
+const { title, description, image, showHeader = true } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<BaseLayout title={title} description={description} image={image}>
+  {showHeader && <Header client:load currentPath={currentPath} />}
+  <main>
+    <slot />
+  </main>
+</BaseLayout>
