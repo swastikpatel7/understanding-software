@@ -1,0 +1,78 @@
+---
+interface Props {
+  variant?: 'horizontal' | 'vertical' | 'diagonal';
+  className?: string;
+  animated?: boolean;
+}
+
+const { variant = 'horizontal', className = '', animated = true } = Astro.props;
+
+const horizontalLines = [20, 40, 60, 80];
+const verticalLines = [15, 35, 55, 75, 95];
+const diagonalOffsets = [-40, -20, 0, 20, 40, 60, 80, 100, 120, 140];
+---
+
+<div class={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+  <svg class="w-full h-full opacity-[0.03]" preserveAspectRatio="none">
+    {variant === 'horizontal' && (
+      <g>
+        {horizontalLines.map((y, i) => (
+          <line
+            x1="0%"
+            y1={`${y}%`}
+            x2="100%"
+            y2={`${y}%`}
+            stroke="currentColor"
+            stroke-width="0.5"
+            stroke-dasharray="8 4"
+            class={`text-primary ${animated ? 'animate-dash' : ''}`}
+            style={`animation-delay: ${y * 0.01}s`}
+          />
+        ))}
+        {/* Data packet indicators */}
+        {horizontalLines.map((y, i) => (
+          <circle
+            cx="10%"
+            cy={`${y}%`}
+            r="2"
+            class={`fill-primary ${animated ? 'animate-pulse-subtle' : ''}`}
+            style={`animation-delay: ${i * 0.3}s`}
+          />
+        ))}
+      </g>
+    )}
+
+    {variant === 'vertical' && (
+      <g>
+        {verticalLines.map((x) => (
+          <line
+            x1={`${x}%`}
+            y1="0%"
+            x2={`${x}%`}
+            y2="100%"
+            stroke="currentColor"
+            stroke-width="0.5"
+            stroke-dasharray="4 8"
+            class="text-primary"
+          />
+        ))}
+      </g>
+    )}
+
+    {variant === 'diagonal' && (
+      <g>
+        {diagonalOffsets.map((offset) => (
+          <line
+            x1={`${offset}%`}
+            y1="0%"
+            x2={`${offset + 40}%`}
+            y2="100%"
+            stroke="currentColor"
+            stroke-width="0.3"
+            class="text-primary"
+          />
+        ))}
+      </g>
+    )}
+  </svg>
+</div>

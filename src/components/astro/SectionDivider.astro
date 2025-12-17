@@ -1,0 +1,92 @@
+---
+interface Props {
+  variant?: "default" | "gradient" | "technical";
+  label?: string;
+}
+
+const { variant = "default", label } = Astro.props;
+
+// Pre-calculate the opacity values for each segment
+const segments = Array.from({ length: 58 }).map((_, i) => {
+  const isCenter = i >= 27 && i <= 31;
+  const distanceFromCenter = Math.abs(i - 29);
+  const baseOpacity = isCenter ? 0 : Math.min(1, distanceFromCenter / 10);
+  const opacity = variant === "gradient" ? baseOpacity * 0.6 + 0.2 : 0.4;
+  return {
+    x: 20 + i * 20,
+    opacity,
+    delay: i * 0.03
+  };
+});
+---
+
+<div class="w-full py-8 overflow-hidden relative" aria-hidden="true">
+  <div class="relative container mx-auto px-8 md:px-16">
+    <svg
+      class="w-full h-4"
+      viewBox="0 0 1200 16"
+      preserveAspectRatio="none"
+    >
+      <!-- Left terminus -->
+      <g class="text-primary/30">
+        <rect x="0" y="6" width="2" height="4" fill="currentColor" />
+        <rect x="4" y="7" width="1" height="2" fill="currentColor" />
+      </g>
+
+      <!-- Animated dashed line with varying opacity -->
+      {segments.map(({ x, opacity, delay }) => (
+        <rect
+          x={x}
+          y="7"
+          width="12"
+          height="2"
+          class="fill-primary animate-pulse-subtle"
+          style={`animation-delay: ${delay}s; opacity: ${opacity}`}
+        />
+      ))}
+
+      <!-- Right terminus -->
+      <g class="text-primary/30">
+        <rect x="1194" y="7" width="1" height="2" fill="currentColor" />
+        <rect x="1198" y="6" width="2" height="4" fill="currentColor" />
+      </g>
+
+      <!-- Center node (if technical variant) -->
+      {variant === "technical" && (
+        <g class="text-primary/40">
+          <circle cx="600" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1" />
+          <circle cx="600" cy="8" r="1" fill="currentColor" class="animate-pulse-subtle" />
+        </g>
+      )}
+    </svg>
+
+    <!-- Optional center label -->
+    {label && (
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="bg-background px-3 font-mono text-[9px] text-primary/40 tracking-[0.3em] uppercase">
+          {label}
+        </span>
+      </div>
+    )}
+
+    <!-- Subtle corner marks at ends -->
+    <div class="absolute left-8 md:left-16 top-1/2 -translate-y-1/2 -translate-x-2">
+      <svg width="8" height="8" class="text-primary/15">
+        <path d="M0 8 L0 0 L8 0" fill="none" stroke="currentColor" stroke-width="1" />
+      </svg>
+    </div>
+    <div class="absolute right-8 md:right-16 top-1/2 -translate-y-1/2 translate-x-2">
+      <svg width="8" height="8" class="text-primary/15">
+        <path d="M0 0 L8 0 L8 8" fill="none" stroke="currentColor" stroke-width="1" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Subtle gradient fade effect -->
+  {variant === "gradient" && (
+    <div
+      class="absolute inset-0 pointer-events-none"
+      style="background: linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.02) 50%, transparent 100%)"
+    />
+  )}
+</div>
