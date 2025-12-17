@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, List } from "lucide-react";
 import Header from "@/components/Header";
@@ -123,6 +124,19 @@ const TopicPage = () => {
   const nextTopic =
     currentIndex < allTopics.length - 1 ? allTopics[currentIndex + 1] : null;
 
+  // Parse content into sections, memoized to avoid re-running on every render.
+  // The hook is placed before the early return to respect the Rules of Hooks.
+  const { sections, illustrations } = useMemo(() => {
+    if (!currentTopic) {
+      // Return a default state that matches the expected structure.
+      return { sections: [], illustrations: { main: null, inline: [] } };
+    }
+    return parseContentWithIllustrations(
+      currentTopic.content,
+      currentTopic.illustrationKey
+    );
+  }, [currentTopic]);
+
   if (!layer || !chapter || !currentTopic) {
     return (
       <div className="min-h-screen relative">
@@ -147,12 +161,6 @@ const TopicPage = () => {
       </div>
     );
   }
-
-  // Parse content into sections
-  const { sections, illustrations } = parseContentWithIllustrations(
-    currentTopic.content,
-    currentTopic.illustrationKey
-  );
 
   return (
     <div className="min-h-screen relative">
