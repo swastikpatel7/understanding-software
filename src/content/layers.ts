@@ -171,7 +171,9 @@ export const LAYERS: Layer[] = [
   },
 ];
 
-export const getAvailableLayers = () => LAYERS.filter((l) => l.status === "available");
+// Pre-filter available layers to avoid re-computation on every call
+export const AVAILABLE_LAYERS = LAYERS.filter((l) => l.status === "available");
+export const getAvailableLayers = () => AVAILABLE_LAYERS;
 export const getComingSoonLayers = () => LAYERS.filter((l) => l.status === "coming_soon");
 export const getLayerBySlug = (slug: string) => LAYERS.find((l) => l.slug === slug);
 export const getLayerByNumber = (num: number) => LAYERS.find((l) => l.number === num);
