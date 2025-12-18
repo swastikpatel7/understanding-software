@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getAvailableLayers } from "@/content/layers";
+import { AVAILABLE_LAYERS } from "@/content/layers";
 
 interface HeaderProps {
   currentPath?: string;
@@ -7,7 +7,7 @@ interface HeaderProps {
 
 const Header = ({ currentPath = "/" }: HeaderProps) => {
   const [isLayersOpen, setIsLayersOpen] = useState(false);
-  const availableLayers = getAvailableLayers();
+  const availableLayers = AVAILABLE_LAYERS;
   const isLayerRoute = currentPath.startsWith("/layer");
 
   const isActive = (path: string) => {
