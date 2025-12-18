@@ -198,10 +198,10 @@ const SoftwareStackBannerSVG = ({ isPaused = false }: CPUSchematicSVGProps) => {
           </g>
 
           {/* Annotations */}
-          <LeaderLine x1="80" y1="70" x2="100" y2="70" />
+          <LeaderLine x1={80} y1={70} x2={100} y2={70} />
           <Annotation x={102} y={72} label="64-BIT BUS" small />
 
-          <LeaderLine x1="80" y1="30" x2="100" y2="20" />
+          <LeaderLine x1={80} y1={30} x2={100} y2={20} />
           <Annotation x={102} y={22} label="IMC" small />
         </g>
 

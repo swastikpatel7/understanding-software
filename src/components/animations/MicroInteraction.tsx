@@ -16,7 +16,7 @@ export default function MicroInteraction({
   const [isHovered, setIsHovered] = useState(false);
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (variant !== 'tilt') return;
 
     const rect = e.currentTarget.getBoundingClientRect();
