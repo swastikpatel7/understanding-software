@@ -1,4 +1,5 @@
 import { Layer } from "@/content/layers";
+import React from "react";
 
 interface LayerCardProps {
   layer: Layer;
@@ -143,4 +144,7 @@ const LayerCard = ({ layer, isExpanded = false }: LayerCardProps) => {
   );
 };
 
-export default LayerCard;
+// Memoize LayerCard to prevent re-renders if props haven't changed.
+// This is beneficial when the parent component re-renders, but the `layer`
+// and `isExpanded` props for this specific card instance remain the same.
+export default React.memo(LayerCard);
