@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Layer } from "@/content/layers";
 
 interface LayerCardProps {
@@ -143,4 +144,7 @@ const LayerCard = ({ layer, isExpanded = false }: LayerCardProps) => {
   );
 };
 
-export default LayerCard;
+// ⚡ Bolt: Wrapped with memo to prevent unnecessary re-renders in list views.
+// This component is visually complex and rendered in a list, making it a good
+// candidate for memoization.
+export default memo(LayerCard);
