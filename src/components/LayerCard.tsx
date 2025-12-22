@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { Layer } from "@/content/layers";
 
@@ -144,4 +145,4 @@ const LayerCard = ({ layer, isExpanded = false }: LayerCardProps) => {
   );
 };
 
-export default LayerCard;
+export default memo(LayerCard);
