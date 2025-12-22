@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { Layer } from "@/content/layers";
 
@@ -6,7 +7,11 @@ interface LayerCardProps {
   isExpanded?: boolean;
 }
 
-const LayerCard = ({ layer, isExpanded = false }: LayerCardProps) => {
+// Optimization: Wrapped with React.memo to prevent unnecessary re-renders when the parent
+// component updates but the props for this component remain unchanged. This is
+// especially beneficial when LayerCard is rendered within a list, improving overall
+// rendering performance.
+const LayerCard = memo(({ layer, isExpanded = false }: LayerCardProps) => {
   const isAvailable = layer.status === "available";
   const totalTopics = layer.chapters.reduce((sum, ch) => sum + ch.topicCount, 0);
 
@@ -142,6 +147,6 @@ const LayerCard = ({ layer, isExpanded = false }: LayerCardProps) => {
       <div className="absolute bottom-1 right-1 w-2 h-2 border-r border-b border-border/30" />
     </div>
   );
-};
+});
 
 export default LayerCard;
