@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 interface TopicCardProps {
   title: string;
   description: string;
@@ -6,7 +8,7 @@ interface TopicCardProps {
   isReversed?: boolean;
 }
 
-const TopicCard = ({ title, description, illustration, figureNumber, isReversed = false }: TopicCardProps) => {
+const TopicCard = memo(({ title, description, illustration, figureNumber, isReversed = false }: TopicCardProps) => {
   return (
     <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center ${isReversed ? 'lg:flex-row-reverse' : ''}`}>
       {/* Text content */}
@@ -31,6 +33,6 @@ const TopicCard = ({ title, description, illustration, figureNumber, isReversed 
       </div>
     </div>
   );
-};
+});
 
 export default TopicCard;
