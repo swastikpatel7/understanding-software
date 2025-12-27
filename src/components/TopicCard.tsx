@@ -1,3 +1,5 @@
+import React from "react";
+
 interface TopicCardProps {
   title: string;
   description: string;
@@ -33,4 +35,7 @@ const TopicCard = ({ title, description, illustration, figureNumber, isReversed 
   );
 };
 
-export default TopicCard;
+// Memoize TopicCard to prevent re-renders if its props haven't changed.
+// This is especially beneficial if TopicCard is part of a list that re-renders,
+// ensuring this component only re-renders when its specific data changes.
+export default React.memo(TopicCard);
