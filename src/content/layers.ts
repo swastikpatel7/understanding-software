@@ -171,9 +171,12 @@ export const LAYERS: Layer[] = [
   },
 ];
 
-// Pre-filter available layers to avoid re-computation on every call
+// Pre-filter layers by status to avoid re-computation on every call.
+// This prevents filtering the static LAYERS array on every function call.
 export const AVAILABLE_LAYERS = LAYERS.filter((l) => l.status === "available");
+export const COMING_SOON_LAYERS = LAYERS.filter((l) => l.status === "coming_soon");
+
 export const getAvailableLayers = () => AVAILABLE_LAYERS;
-export const getComingSoonLayers = () => LAYERS.filter((l) => l.status === "coming_soon");
+export const getComingSoonLayers = () => COMING_SOON_LAYERS;
 export const getLayerBySlug = (slug: string) => LAYERS.find((l) => l.slug === slug);
 export const getLayerByNumber = (num: number) => LAYERS.find((l) => l.number === num);
