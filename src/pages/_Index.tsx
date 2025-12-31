@@ -13,6 +13,13 @@ import CircuitPatternBackground from "@/components/CircuitPatternBackground";
 import FloatingGridOverlay from "@/components/FloatingGridOverlay";
 import { SectionAnnotations } from "@/components/FloatingTechAnnotation";
 
+const TOC_ITEMS = [
+  { id: "intro", label: "Overview", number: "00" },
+  { id: "philosophy", label: "Philosophy", number: "01" },
+  { id: "layers", label: "The Stack", number: "02" },
+  { id: "roadmap", label: "Roadmap", number: "03" },
+];
+
 const Index = () => {
   const availableLayers = getAvailableLayers();
   const comingSoonLayers = getComingSoonLayers();
@@ -26,14 +33,7 @@ const Index = () => {
       <FloatingGridOverlay />
 
       <Header />
-      <TableOfContents
-        items={[
-          { id: "intro", label: "Overview", number: "00" },
-          { id: "philosophy", label: "Philosophy", number: "01" },
-          { id: "layers", label: "The Stack", number: "02" },
-          { id: "roadmap", label: "Roadmap", number: "03" },
-        ]}
-      />
+      <TableOfContents items={TOC_ITEMS} />
 
       <SectionDivider variant="technical" />
 
