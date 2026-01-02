@@ -10,7 +10,8 @@
     "astro": "astro",
     "dev:vite": "vite",
     "build:vite": "vite build",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build:dev": "vite build --mode development"
   },
   "dependencies": {
     "@astrojs/react": "^4.4.2",
