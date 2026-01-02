@@ -10,7 +10,6 @@ import ChapterPage from "./pages/_ChapterPage";
 import ChaptersOverview from "./pages/_ChaptersOverview";
 import TopicPage from "./pages/_TopicPage";
 import About from "./pages/_About";
-import Health from "./pages/_Health";
 
 const queryClient = new QueryClient();
 
@@ -29,7 +28,6 @@ const App = () => (
           {/* Legacy routes - keeping for backwards compatibility */}
           <Route path="/chapters" element={<ChaptersOverview />} />
           <Route path="/about" element={<About />} />
-          <Route path="/health" element={<Health />} />
           <Route path="/read/:chapterSlug/:topicSlug" element={<TopicPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
