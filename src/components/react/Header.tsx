@@ -92,6 +92,16 @@ const Header = ({ currentPath = "/" }: HeaderProps) => {
           </div>
 
           <a
+            href="/health"
+            className={[
+              "font-mono text-xs uppercase tracking-widest transition-colors",
+              isActive("/health") ? "text-primary" : "text-muted-foreground hover:text-primary",
+            ].join(" ")}
+          >
+            Health
+          </a>
+
+          <a
             href="/about"
             className={[
               "font-mono text-xs uppercase tracking-widest transition-colors",
