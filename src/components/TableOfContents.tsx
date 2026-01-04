@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 type TocItem = { id: string; label: string; number?: string };
@@ -10,7 +10,10 @@ const defaultItems: TocItem[] = [
   { id: 'chapters', label: 'Chapters', number: '04' },
 ];
 
-const TableOfContents = ({ items = defaultItems }: { items?: TocItem[] }) => {
+// Optimization: Wrapped with React.memo to prevent re-renders when the parent component
+// updates but the `items` prop remains unchanged. This is a defensive optimization
+// that improves rendering performance by avoiding unnecessary component updates.
+const TableOfContents = memo(({ items = defaultItems }: { items?: TocItem[] }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeSection, setActiveSection] = useState(items[0]?.id ?? 'intro');
 
