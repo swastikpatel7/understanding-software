@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 type TocItem = { id: string; label: string; number?: string };
@@ -37,13 +37,13 @@ const TableOfContents = ({ items = defaultItems }: { items?: TocItem[] }) => {
     return () => observer.disconnect();
   }, [items]);
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = useCallback((id: string) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setIsExpanded(false);
     }
-  };
+  }, []);
 
   return (
     <nav className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:block">
@@ -127,4 +127,4 @@ const TableOfContents = ({ items = defaultItems }: { items?: TocItem[] }) => {
   );
 };
 
-export default TableOfContents;
+export default React.memo(TableOfContents);
