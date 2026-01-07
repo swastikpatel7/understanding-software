@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 interface TopicCardProps {
   title: string;
   description: string;
@@ -6,7 +8,11 @@ interface TopicCardProps {
   isReversed?: boolean;
 }
 
-const TopicCard = ({ title, description, illustration, figureNumber, isReversed = false }: TopicCardProps) => {
+// Optimization: Wrapped with React.memo to prevent unnecessary re-renders when the parent
+// component's state changes but this component's props remain the same. This is
+// particularly useful when TopicCard is rendered in a list or grid, enhancing
+// overall application performance by reducing the render load.
+const TopicCard = memo(({ title, description, illustration, figureNumber, isReversed = false }: TopicCardProps) => {
   return (
     <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center ${isReversed ? 'lg:flex-row-reverse' : ''}`}>
       {/* Text content */}
@@ -31,6 +37,6 @@ const TopicCard = ({ title, description, illustration, figureNumber, isReversed 
       </div>
     </div>
   );
-};
+});
 
 export default TopicCard;
