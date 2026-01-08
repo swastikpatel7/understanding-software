@@ -149,4 +149,4 @@ const LayerCard = memo(({ layer, isExpanded = false }: LayerCardProps) => {
   );
 });
 
-export default LayerCard;
+export default memo(LayerCard);
