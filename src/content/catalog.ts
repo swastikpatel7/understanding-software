@@ -72,34 +72,63 @@ const matchesCategoryByTitle = (categorySlug: string, title: string) => {
   }
 };
 
+// This function is performance-optimized. Instead of iterating through all remaining
+// chapters for each category (O(M*N)), it processes each chapter once (O(N*M))
+// to determine its category, significantly reducing redundant computations.
 export const groupChaptersByCategory = <TChapter extends CatalogChapter>(
   chapters: TChapter[]
 ): ChapterGroup<TChapter>[] => {
-  const remaining = new Map(chapters.map((c) => [c.slug, c]));
-  const groups: ChapterGroup<TChapter>[] = [];
-
+  // Pre-build a map for quick lookups of a chapter's category by its slug.
+  const slugToCategory = new Map<string, string>();
   for (const category of CATALOG_CATEGORIES) {
-    const categoryChapters: TChapter[] = [];
-
     for (const slug of category.chapterSlugs ?? []) {
-      const chapter = remaining.get(slug);
-      if (!chapter) continue;
-      categoryChapters.push(chapter);
-      remaining.delete(slug);
-    }
-
-    for (const chapter of remaining.values()) {
-      if (!matchesCategoryByTitle(category.slug, chapter.title)) continue;
-      categoryChapters.push(chapter);
-      remaining.delete(chapter.slug);
-    }
-
-    if (categoryChapters.length > 0) {
-      groups.push({ category, chapters: categoryChapters });
+      slugToCategory.set(slug, category.slug);
     }
   }
 
-  const otherChapters = [...remaining.values()];
+  const chaptersByCatSlug = new Map<string, TChapter[]>();
+  const unmappedChapters: TChapter[] = [];
+
+  // First pass: assign chapters with explicit slug mappings.
+  for (const chapter of chapters) {
+    const categorySlug = slugToCategory.get(chapter.slug);
+    if (categorySlug) {
+      if (!chaptersByCatSlug.has(categorySlug)) {
+        chaptersByCatSlug.set(categorySlug, []);
+      }
+      chaptersByCatSlug.get(categorySlug)!.push(chapter);
+    } else {
+      unmappedChapters.push(chapter);
+    }
+  }
+
+  const otherChapters: TChapter[] = [];
+
+  // Second pass: categorize remaining chapters by title match.
+  for (const chapter of unmappedChapters) {
+    const matchedCategory = CATALOG_CATEGORIES.find((cat) =>
+      matchesCategoryByTitle(cat.slug, chapter.title)
+    );
+
+    if (matchedCategory) {
+      const { slug } = matchedCategory;
+      if (!chaptersByCatSlug.has(slug)) {
+        chaptersByCatSlug.set(slug, []);
+      }
+      chaptersByCatSlug.get(slug)!.push(chapter);
+    } else {
+      otherChapters.push(chapter);
+    }
+  }
+
+  // Build the final list of groups, preserving the original category order.
+  const groups: ChapterGroup<TChapter>[] = CATALOG_CATEGORIES.map(
+    (category) => ({
+      category,
+      chapters: chaptersByCatSlug.get(category.slug) || [],
+    })
+  ).filter((group) => group.chapters.length > 0);
+
   if (otherChapters.length > 0) {
     groups.push({ category: OTHER_CATEGORY, chapters: otherChapters });
   }
