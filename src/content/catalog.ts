@@ -75,36 +75,61 @@ const matchesCategoryByTitle = (categorySlug: string, title: string) => {
 export const groupChaptersByCategory = <TChapter extends CatalogChapter>(
   chapters: TChapter[]
 ): ChapterGroup<TChapter>[] => {
-  const remaining = new Map(chapters.map((c) => [c.slug, c]));
-  const groups: ChapterGroup<TChapter>[] = [];
+  // Optimization: This function was refactored from a nested-loop approach (O(M*N))
+  // to a more efficient single pass over the chapters. By using maps for efficient
+  // lookups, we avoid repeated iteration and reduce the overall complexity, making it
+  // faster, especially as the number of chapters grows.
 
+  const groupsByCatSlug = new Map<string, TChapter[]>();
+
+  // Pre-build a map for quick slug-to-category lookups.
+  const categorySlugByChapterSlug = new Map<string, string>();
   for (const category of CATALOG_CATEGORIES) {
-    const categoryChapters: TChapter[] = [];
-
-    for (const slug of category.chapterSlugs ?? []) {
-      const chapter = remaining.get(slug);
-      if (!chapter) continue;
-      categoryChapters.push(chapter);
-      remaining.delete(slug);
-    }
-
-    for (const chapter of remaining.values()) {
-      if (!matchesCategoryByTitle(category.slug, chapter.title)) continue;
-      categoryChapters.push(chapter);
-      remaining.delete(chapter.slug);
-    }
-
-    if (categoryChapters.length > 0) {
-      groups.push({ category, chapters: categoryChapters });
+    for (const chapterSlug of category.chapterSlugs ?? []) {
+      categorySlugByChapterSlug.set(chapterSlug, category.slug);
     }
   }
 
-  const otherChapters = [...remaining.values()];
-  if (otherChapters.length > 0) {
-    groups.push({ category: OTHER_CATEGORY, chapters: otherChapters });
+  // Single pass over all chapters to assign them to a category.
+  for (const chapter of chapters) {
+    let assignedCategorySlug: string | undefined = categorySlugByChapterSlug.get(
+      chapter.slug
+    );
+
+    // If not found by explicit slug, try to match by title.
+    if (!assignedCategorySlug) {
+      for (const category of CATALOG_CATEGORIES) {
+        if (matchesCategoryByTitle(category.slug, chapter.title)) {
+          assignedCategorySlug = category.slug;
+          break; // Assign to the first matching category.
+        }
+      }
+    }
+
+    const finalCategorySlug = assignedCategorySlug ?? OTHER_CATEGORY.slug;
+
+    if (!groupsByCatSlug.has(finalCategorySlug)) {
+      groupsByCatSlug.set(finalCategorySlug, []);
+    }
+    groupsByCatSlug.get(finalCategorySlug)!.push(chapter);
   }
 
-  return groups;
+  // Format the output array, preserving the original category order.
+  const result: ChapterGroup<TChapter>[] = [];
+  for (const category of CATALOG_CATEGORIES) {
+    const groupedChapters = groupsByCatSlug.get(category.slug);
+    if (groupedChapters && groupedChapters.length > 0) {
+      result.push({ category, chapters: groupedChapters });
+    }
+  }
+
+  // Add any remaining chapters (e.g., "other") to the end.
+  const otherChapters = groupsByCatSlug.get(OTHER_CATEGORY.slug);
+  if (otherChapters && otherChapters.length > 0) {
+    result.push({ category: OTHER_CATEGORY, chapters: otherChapters });
+  }
+
+  return result;
 };
 
 export const TOPIC_SECTION_TEMPLATE = [
